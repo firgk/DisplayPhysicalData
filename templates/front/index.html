@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>学生体测数据</title>
+    <meta charset="utf-8">
+    {% include 'front/common/header.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <style>
+        .layui-table-cell {
+            height: auto;
+            line-height: 28px;
+            padding: 6px 15px;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            word-break: break-all;
+        }
+        .score-good {
+            color: #5FB878;
+        }
+        .score-warning {
+            color: #FFB800;
+        }
+        .score-bad {
+            color: #FF5722;
+        }
+        .data-card {
+            margin-bottom: 15px;
+        }
+        .data-card .layui-card-header {
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .data-card .layui-card-body {
+            padding: 20px;
+        }
+        .basic-info {
+            margin-bottom: 20px;
+        }
+        .basic-info-item {
+            display: inline-block;
+            margin-right: 30px;
+            margin-bottom: 10px;
+        }
+        .basic-info-item .label {
+            color: #666;
+            margin-right: 10px;
+        }
+        .basic-info-item .value {
+            font-weight: bold;
+        }
+        .score-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .score-item {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+            margin: 0 10px;
+        }
+        .score-item:first-child {
+            margin-left: 0;
+        }
+        .score-item:last-child {
+            margin-right: 0;
+        }
+        .score-item .title {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .score-item .value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .logout-btn {
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card data-card">
+        <div class="layui-card-header">
+            <span>学生体测数据</span>
+            <button class="layui-btn layui-btn-danger layui-btn-sm logout-btn" id="logoutBtn">退出登录</button>
+        </div>
+        <div class="layui-card-body">
+            <!-- 基本信息 -->
+            <div class="basic-info">
+                <div class="basic-info-item">
+                    <span class="label">学号：</span>
+                    <span class="value">{{ user.sNumber }}</span>
+                </div>
+                <div class="basic-info-item">
+                    <span class="label">姓名：</span>
+                    <span class="value">{{ user.sName }}</span>
+                </div>
+                <div class="basic-info-item">
+                    <span class="label">性别：</span>
+                    <span class="value">{{ user.sSex }}</span>
+                </div>
+                <div class="basic-info-item">
+                    <span class="label">学院：</span>
+                    <span class="value">{{ user.collegeCode }}</span>
+                </div>
+                <div class="basic-info-item">
+                    <span class="label">年级：</span>
+                    <span class="value">{{ user.grade }}</span>
+                </div>
+                <div class="basic-info-item">
+                    <span class="label">班级：</span>
+                    <span class="value">{{ user.classNum }}</span>
+                </div>
+            </div>
+
+            <!-- BMI和总成绩 -->
+            <div class="score-summary">
+                <div class="score-item">
+                    <div class="title">BMI</div>
+                    <div class="value">{{ user.score_bmi }}</div>
+                </div>
+                <div class="score-item">
+                    <div class="title">总成绩</div>
+                    <div class="value {% if user.score_error == '1' %}score-bad{% else %}score-good{% endif %}">
+                        {% if user.score_error == '1' %}异常{% else %}{{ user.score_allScore }}{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <table class="layui-table">
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>测试数据</th>
+                        <th>成绩</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>身高</td>
+                        <td>{{ user.sHeight }} cm</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>体重</td>
+                        <td>{{ user.sWeight }} kg</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>肺活量</td>
+                        <td>{{ user.sVitalCapacity }} ml</td>
+                        <td>{{ user.score_sVitalCapacity }}</td>
+                    </tr>
+                    <tr>
+                        <td>50米跑</td>
+                        <td>{{ user.run50 }} s</td>
+                        <td>{{ user.score_run50 }}</td>
+                    </tr>
+                    <tr>
+                        <td>立定跳远</td>
+                        <td>{{ user.standingLongJump }} cm</td>
+                        <td>{{ user.score_standingLongJump }}</td>
+                    </tr>
+                    <tr>
+                        <td>坐位体前屈</td>
+                        <td>{{ user.sittingForward }} cm</td>
+                        <td>{{ user.score_sittingForward }}</td>
+                    </tr>
+                    <tr>
+                        <td>800米跑</td>
+                        <td>{{ user.run800 }} s</td>
+                        <td>{{ user.score_run800 }}</td>
+                    </tr>
+                    <tr>
+                        <td>1000米跑</td>
+                        <td>{{ user.run1000 }} s</td>
+                        <td>{{ user.score_run1000 }}</td>
+                    </tr>
+                    <tr>
+                        <td>仰卧起坐</td>
+                        <td>{{ user.oneMinuteSitUps }} 个</td>
+                        <td>{{ user.score_oneMinuteSitUps }}</td>
+                    </tr>
+                    <tr>
+                        <td>引体向上</td>
+                        <td>{{ user.pullUP }} 个</td>
+                        <td>{{ user.score_pullUP }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {% if user.score_error == '1' %}
+            <div class="layui-card" style="margin-top: 20px; background-color: #fff2f0;">
+                <div class="layui-card-body">
+                    <span class="label">异常信息：</span>
+                    <span class="value score-bad">{{ user.score_errormessage }}</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+
+<script src="{{ url_for('static', filename='system/component/layui/layui.js') }}"></script>
+
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer;
+    var $ = layui.jquery;
+
+    // 退出登录
+    $('#logoutBtn').on('click', function(){
+        layer.confirm('确定要退出登录吗？', {
+            btn: ['确定','取消']
+        }, function(){
+            let loading = layer.load();
+            $.ajax({
+                url: '{{ url_for('system.passport.logout') }}',
+                dataType: 'json',
+                async: false,
+                type: 'post',
+                success: function (result) {
+                    layer.close(loading);
+                    if (result.success) {
+                        layer.msg(result.msg, {
+                            icon: 1,
+                            time: 1000
+                        }, function(){
+                            location.href = '/';
+                        });
+                    }
+                }
+            });
+        });
+    });
+});
+</script>
+</body>
+</html> 

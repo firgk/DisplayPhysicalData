@@ -1,0 +1,54 @@
+<mxfile host="65bd71144e">
+    <diagram id="uxUl18Fv2Q7JW2zgXG6D" name="Page-1">
+        <mxGraphModel dx="2038" dy="487" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="data" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="-120" y="370" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="score" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="-120" y="430" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" style="edgeStyle=none;html=1;" parent="1" source="7" target="21" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="130" y="330" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7" value="college" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="305" y="250" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="谁有&amp;nbsp;&lt;span style=&quot;background-color: transparent;&quot;&gt;id 我指向谁&lt;/span&gt;" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="120" y="120" width="240" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="student" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="-120" y="250" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="info" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="-120" y="310" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" style="edgeStyle=none;html=1;" parent="1" source="15" target="18" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="model" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="580" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="init" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="640" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="script-admin" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="580" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" style="edgeStyle=none;html=1;" parent="1" source="18" target="17" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="makedata" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="280" y="580" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="collegeid" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry y="250" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

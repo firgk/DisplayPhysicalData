@@ -1,0 +1,8 @@
+rm -rf migrations/
+rm -f ../pear.db
+python makeCollege.py
+python makeStudent.py
+flask db init
+flask db migrate
+flask db upgrade
+flask admin init
