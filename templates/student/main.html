@@ -1,79 +1,80 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>用户管理</title>
     {% include 'system/common/header.html' %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='system/admin/css/other/user.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='system/admin/css/other/user.css') }}" />
 </head>
+
 <body class="pear-container">
-{# 查询表单 #}
-<div class="layui-card">
-    <div class="layui-card-body">
-        <form class="layui-form" action="" lay-filter="user-query-form">
-            <div class="layui-form-item" style="margin-bottom: unset;">
-                <label class="layui-form-label">姓名</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="realname" placeholder="" class="layui-input">
-                </div>
-                <label class="layui-form-label">学号</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="username" placeholder="" class="layui-input">
-                </div>
-                <button class="layui-btn layui-btn-md" lay-submit lay-filter="user-query">
-                    <i class="layui-icon layui-icon-search"></i>
-                    查询
-                </button>
-                <button type="reset" class="layui-btn layui-btn-primary layui-btn-md">
-                    <i class="layui-icon layui-icon-refresh"></i>
-                    重置
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-<div class="user-left user-collasped">
+    {# 查询表单 #}
     <div class="layui-card">
         <div class="layui-card-body">
-            <div class="button button-primary user-group" user-group=""> 全 部 用 户</div>
-            <div class="button button-default user-group" user-group="-1"> 默 认 分 组</div>
-            <div style="overflow: auto">
-                <ul id="dept-tree" class="dept-tree" data-id="0"></ul>
+            <form class="layui-form" action="" lay-filter="user-query-form">
+                <div class="layui-form-item" style="margin-bottom: unset;">
+                    <label class="layui-form-label">姓名</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="realname" placeholder="" class="layui-input">
+                    </div>
+                    <label class="layui-form-label">学号</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="username" placeholder="" class="layui-input">
+                    </div>
+                    <button class="layui-btn layui-btn-md" lay-submit lay-filter="user-query">
+                        <i class="layui-icon layui-icon-search"></i>
+                        查询
+                    </button>
+                    <button type="reset" class="layui-btn layui-btn-primary layui-btn-md">
+                        <i class="layui-icon layui-icon-refresh"></i>
+                        重置
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="user-left user-collasped">
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <div class="button button-primary user-group" user-group=""> 全 部 用 户</div>
+                <div class="button button-default user-group" user-group="-1"> 默 认 分 组</div>
+                <div style="overflow: auto">
+                    <ul id="dept-tree" class="dept-tree" data-id="0"></ul>
+                </div>
             </div>
         </div>
     </div>
-</div>
-{# 用户表格 #}
-<div class="user-main user-collasped">
-    <div class="layui-card">
-        <div class="layui-card-body">
-            <table id="user-table" lay-filter="user-table"></table>
+    {# 用户表格 #}
+    <div class="user-main user-collasped">
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <table id="user-table" lay-filter="user-table"></table>
+            </div>
         </div>
     </div>
-</div>
+
+
 </body>
 
 {% include 'system/common/footer.html' %}
 {# 表格操作 #}
 <script type="text/html" id="user-toolbar">
-    {% if authorize("student:addpage") %}
+
+    {% if authorize("student:info") %}
         <button class="layui-btn layui-btn-primary layui-btn-sm" lay-event="add">
             <i class="pear-icon pear-icon-add"></i>
             新增
         </button>
     {% endif %}
-    <button class="layui-btn layui-btn-sm" lay-event="collasped">
-        <i class="pear-icon pear-icon-modular"></i>
-        高级
-    </button>
 </script>
 
 {# 用户修改操作 #}
 <script type="text/html" id="user-bar">
-    {% if authorize("system:user:edit") %}
+    {% if authorize("student:info") %}
         <button class="layui-btn layui-btn-xs" lay-event="edit"><i class="pear-icon pear-icon-edit"> 编辑</i>
         </button>
     {% endif %}
-    {% if authorize("system:user:remove") %}
+    {% if authorize("student:info") %}
         <button class="layui-btn layui-btn-danger layui-btn-xs" lay-event="remove"><i
                 class="pear-icon pear-icon-ashbin"> 删除</i>
         </button>
@@ -87,17 +88,24 @@
             {{# if(d.enable==1){ }} checked {{# } }} />
 </script>
 
-<script type="text/html" id="user-createTime">
-    {{layui.util.toDateString(d.create_at,  "yyyy-MM-dd HH:mm:ss")}}
-</script>
 
-<script type="text/html" id="user-updateTime">
+
+<!-- <script type="text/html" id="user-Time">
     {{layui.util.toDateString(d.update_at,  "yyyy-MM-dd HH:mm:ss")}}
-</script>
+</script> -->
 {% endraw %}
 
 
 <script>
+
+
+
+    // 可复用
+
+
+
+
+
     layui.use(['table', 'dtree', 'form', 'jquery', 'popup', 'common'], function () {
         let table = layui.table
         let form = layui.form
@@ -105,19 +113,39 @@
         let dtree = layui.dtree
         let popup = layui.popup
         let common = layui.common
-        let MODULE_PATH = "{{ url_for('system.user.main') }}"
-        // 表格数据
+        let MODULE_PATH = "{{ url_for('student.info') }}"
+
         let cols = [
             [
-                {title: '编号', field: 'id', align: 'center'},
-                {title: '姓名', field: 'realname', align: 'center', width: 110},
-                {title: '账号', field: 'username', align: 'center'},
-                {title: '启用', field: 'enable', align: 'center', templet: '#user-enable', width: 120},
-                {title: '注册时间', field: 'create_at', templet: '#user-createTime', align: 'center'},
-                {title: '更新时间', field: 'update_at', templet: '#user-updateTime', align: 'center'},
-                {title: '操作', toolbar: '#user-bar', align: 'center', width: 180}
+                { title: '编号', field: 'id', align: 'center' },
+                { title: '姓名', field: 'sName', align: 'center', width: 110 },
+                { title: '性别', field: 'sSex', align: 'center', width: 180 },
+                { title: '学号', field: 'sNumber', align: 'center' },
+                { title: '学院', field: 'collegeCode', align: 'center', templet: collegeCode, width: 120 },
+                { title: '启用', field: 'enable', align: 'center', templet: '#user-enable', width: 120 },
+                { title: '年级', field: 'grade', align: 'center' },
+                { title: '班级', field: 'classNum', align: 'center' },
+                { title: '出生日期', field: 'sBirthDate', templet: '#user-Time', align: 'center', width: 180 },
+                { title: '操作', toolbar: '#user-bar', align: 'center', width: 180 }
+
             ]
         ]
+
+        function collegeCode(d) {
+            let collegeMap = {};
+            $.ajax({
+                url: '/student/data/college',
+                type: 'GET',
+                async: false,
+                success: function (res) {
+                    res.forEach(function (item) {
+                        collegeMap[item.collegeCode] = item.className;
+                    });
+                }
+            });
+            return collegeMap[d.collegeCode] || d.collegeCode;
+        }
+
 
         // 渲染表格数据
         table.render({
@@ -127,8 +155,8 @@
             cols: cols,
             skin: 'line',
             toolbar: '#user-toolbar', /*工具栏*/
-            text: {none: '暂无人员信息'},
-            defaultToolbar: [{layEvent: 'refresh', icon: 'layui-icon-refresh'}, 'filter', 'print', 'exports'] /*默认工具栏*/
+            text: { none: '暂无人员信息' },
+            defaultToolbar: [{ layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'filter', 'print', 'exports'] /*默认工具栏*/
         })
 
 
@@ -187,6 +215,7 @@
         })
 
         form.on('switch(user-enable)', function (obj) {
+
             let operate
             if (obj.elem.checked) {
                 operate = 'enable'
@@ -195,8 +224,8 @@
             }
             let loading = layer.load()
             $.ajax({
-                url: '{{ url_for('system.user.main') }}' + operate,
-                data: JSON.stringify({userId: this.value}),
+                url: MODULE_PATH + operate,
+                data: JSON.stringify({ userId: this.value }),
                 dataType: 'json',
                 contentType: 'application/json',
                 type: 'put',
@@ -232,7 +261,7 @@
         }
 
         window.remove = function (obj) {
-            layer.confirm('确定要删除该用户', {icon: 3, title: '提示'}, function (index) {
+            layer.confirm('确定要删除该用户', { icon: 3, title: '提示' }, function (index) {
                 layer.close(index)
                 let loading = layer.load()
                 $.ajax({
@@ -255,8 +284,9 @@
 
 
         window.refresh = function (param) {
-            table.reload('user-table', {where: param})
+            table.reload('user-table', { where: param })
         }
     })
 </script>
+
 </html>

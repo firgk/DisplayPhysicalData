@@ -56,48 +56,48 @@ class Student(db.Model, UserMixin):
 
 
 
-    def __init__(self, id, collegeCode, grade, classNum, sNumber, sName, sSex, sBirthDate, sHeight, sWeight,
-                 sVitalCapacity,
-                 run50, standingLongJump, sittingForward, run800, run1000, oneMinuteSitUps, pullUP, score_bmi,
-                 score_sVitalCapacity,
-                 score_run50, score_standingLongJump, score_sittingForward, score_run800, score_run1000
-                 , score_oneMinuteSitUps, score_pullUP, score_allScore,
-                    score_error ,score_errormessage,password_hash,enable
-                 ):
-        self.id = id
-        self.collegeCode = collegeCode
-        self.grade = grade
-        self.classNum = classNum
-        self.sNumber = sNumber
-        self.sName = sName
-        self.sSex = sSex
-        self.sBirthDate = sBirthDate
-        self.sHeight = sHeight
-        self.sWeight = sWeight
-        self.sVitalCapacity = sVitalCapacity
-        self.run50 = run50
-        self.standingLongJump = standingLongJump
-        self.sittingForward = sittingForward
-        self.run800 = run800
-        self.run1000 = run1000
-        self.oneMinuteSitUps = oneMinuteSitUps
-        self.pullUP = pullUP
-
-        self.score_bmi = score_bmi
-        self.score_sVitalCapacity = score_sVitalCapacity
-        self.score_run50 = score_run50
-        self.score_standingLongJump = score_standingLongJump
-        self.score_sittingForward = score_sittingForward
-        self.score_run800 = score_run800
-        self.score_run1000 = score_run1000
-        self.score_oneMinuteSitUps = score_oneMinuteSitUps
-        self.score_pullUP = score_pullUP
-        self.score_allScore = score_allScore
-
-        self.score_error = score_error
-        self.score_errormessage = score_errormessage
-        self.password_hash = password_hash
-        self.enable = enable
+    # def __init__(self, id, collegeCode, grade, classNum, sNumber, sName, sSex, sBirthDate, sHeight, sWeight,
+    #              sVitalCapacity,
+    #              run50, standingLongJump, sittingForward, run800, run1000, oneMinuteSitUps, pullUP, score_bmi,
+    #              score_sVitalCapacity,
+    #              score_run50, score_standingLongJump, score_sittingForward, score_run800, score_run1000
+    #              , score_oneMinuteSitUps, score_pullUP, score_allScore,
+    #                 score_error ,score_errormessage,password_hash,enable
+    #              ):
+    #     self.id = id
+    #     self.collegeCode = collegeCode
+    #     self.grade = grade
+    #     self.classNum = classNum
+    #     self.sNumber = sNumber
+    #     self.sName = sName
+    #     self.sSex = sSex
+    #     self.sBirthDate = sBirthDate
+    #     self.sHeight = sHeight
+    #     self.sWeight = sWeight
+    #     self.sVitalCapacity = sVitalCapacity
+    #     self.run50 = run50
+    #     self.standingLongJump = standingLongJump
+    #     self.sittingForward = sittingForward
+    #     self.run800 = run800
+    #     self.run1000 = run1000
+    #     self.oneMinuteSitUps = oneMinuteSitUps
+    #     self.pullUP = pullUP
+    #
+    #     self.score_bmi = score_bmi
+    #     self.score_sVitalCapacity = score_sVitalCapacity
+    #     self.score_run50 = score_run50
+    #     self.score_standingLongJump = score_standingLongJump
+    #     self.score_sittingForward = score_sittingForward
+    #     self.score_run800 = score_run800
+    #     self.score_run1000 = score_run1000
+    #     self.score_oneMinuteSitUps = score_oneMinuteSitUps
+    #     self.score_pullUP = score_pullUP
+    #     self.score_allScore = score_allScore
+    #
+    #     self.score_error = score_error
+    #     self.score_errormessage = score_errormessage
+    #     self.password_hash = password_hash
+    #     self.enable = enable
 
 
     def __repr__(self):

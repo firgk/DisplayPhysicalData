@@ -1,79 +1,77 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>用户管理</title>
     {% include 'system/common/header.html' %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='system/admin/css/other/user.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='system/admin/css/other/user.css') }}" />
 </head>
+
 <body class="pear-container">
-{# 查询表单 #}
-<div class="layui-card">
-    <div class="layui-card-body">
-        <form class="layui-form" action="" lay-filter="user-query-form">
-            <div class="layui-form-item" style="margin-bottom: unset;">
-                <label class="layui-form-label">用户</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="realname" placeholder="" class="layui-input">
-                </div>
-                <label class="layui-form-label">账号</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="username" placeholder="" class="layui-input">
-                </div>
-                <button class="layui-btn layui-btn-md" lay-submit lay-filter="user-query">
-                    <i class="layui-icon layui-icon-search"></i>
-                    查询
-                </button>
-                <button type="reset" class="layui-btn layui-btn-primary layui-btn-md">
-                    <i class="layui-icon layui-icon-refresh"></i>
-                    重置
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-<div class="user-left user-collasped">
+    {# 查询表单 #}
     <div class="layui-card">
         <div class="layui-card-body">
-            <div class="button button-primary user-group" user-group=""> 全 部 用 户</div>
-            <div class="button button-default user-group" user-group="-1"> 默 认 分 组</div>
-            <div style="overflow: auto">
-                <ul id="dept-tree" class="dept-tree" data-id="0"></ul>
+            <form class="layui-form" action="" lay-filter="user-query-form">
+                <div class="layui-form-item" style="margin-bottom: unset;">
+                    <label class="layui-form-label">姓名</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="realname" placeholder="" class="layui-input">
+                    </div>
+                    <label class="layui-form-label">学号</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="username" placeholder="" class="layui-input">
+                    </div>
+                    <button class="layui-btn layui-btn-md" lay-submit lay-filter="user-query">
+                        <i class="layui-icon layui-icon-search"></i>
+                        查询
+                    </button>
+                    <button type="reset" class="layui-btn layui-btn-primary layui-btn-md">
+                        <i class="layui-icon layui-icon-refresh"></i>
+                        重置
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="user-left user-collasped">
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <div class="button button-primary user-group" user-group=""> 全 部 用 户</div>
+                <div class="button button-default user-group" user-group="-1"> 默 认 分 组</div>
+                <div style="overflow: auto">
+                    <ul id="dept-tree" class="dept-tree" data-id="0"></ul>
+                </div>
             </div>
         </div>
     </div>
-</div>
-{# 用户表格 #}
-<div class="user-main user-collasped">
-    <div class="layui-card">
-        <div class="layui-card-body">
-            <table id="user-table" lay-filter="user-table"></table>
+    {# 用户表格 #}
+    <div class="user-main user-collasped">
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <table id="user-table" lay-filter="user-table"></table>
+            </div>
         </div>
     </div>
-</div>
 </body>
 
 {% include 'system/common/footer.html' %}
-{# 表格操作 #}
-<script type="text/html" id="user-toolbar">
-    {% if authorize("system:user:add") %}
-        <button class="layui-btn layui-btn-primary layui-btn-sm" lay-event="add">
-            <i class="pear-icon pear-icon-add"></i>
-            新增
-        </button>
-    {% endif %}
-    <button class="layui-btn layui-btn-sm" lay-event="collasped">
-        <i class="pear-icon pear-icon-modular"></i>
-        高级
-    </button>
+
+   
 </script>
 
 {# 用户修改操作 #}
 <script type="text/html" id="user-bar">
-    {% if authorize("system:user:edit") %}
+    {% if authorize("student:data") %}
+    <button class="layui-btn layui-btn-xs" lay-event="view" style="background-color: #2076d3; color: white; border-radius: 5px;">
+        <i class="pear-icon"></i> 成绩查看
+    </button>
+    </button>
+    {% endif %}
+    {% if authorize("student:data") %}
         <button class="layui-btn layui-btn-xs" lay-event="edit"><i class="pear-icon pear-icon-edit"> 编辑</i>
         </button>
     {% endif %}
-    {% if authorize("system:user:remove") %}
+    {% if authorize("student:data") %}
         <button class="layui-btn layui-btn-danger layui-btn-xs" lay-event="remove"><i
                 class="pear-icon pear-icon-ashbin"> 删除</i>
         </button>
@@ -87,13 +85,15 @@
             {{# if(d.enable==1){ }} checked {{# } }} />
 </script>
 
-<script type="text/html" id="user-createTime">
-    {{layui.util.toDateString(d.create_at,  "yyyy-MM-dd HH:mm:ss")}}
+<!-- TODO -->
+
+<script type="text/html" id="collegeCode">
+    {{ d.collegeCode }}
 </script>
 
-<script type="text/html" id="user-updateTime">
+<!-- <script type="text/html" id="user-Time">
     {{layui.util.toDateString(d.update_at,  "yyyy-MM-dd HH:mm:ss")}}
-</script>
+</script> -->
 {% endraw %}
 
 
@@ -105,19 +105,30 @@
         let dtree = layui.dtree
         let popup = layui.popup
         let common = layui.common
-        let MODULE_PATH = "{{ url_for('system.user.main') }}"
-        // 表格数据
+        let MODULE_PATH = "{{ url_for('student.data') }}"
+
         let cols = [
             [
-                {title: '编号', field: 'id', align: 'center'},
-                {title: '姓名', field: 'realname', align: 'center', width: 110},
-                {title: '账号', field: 'username', align: 'center'},
-                {title: '启用', field: 'enable', align: 'center', templet: '#user-enable', width: 120},
-                {title: '注册时间', field: 'create_at', templet: '#user-createTime', align: 'center'},
-                {title: '更新时间', field: 'update_at', templet: '#user-updateTime', align: 'center'},
-                {title: '操作', toolbar: '#user-bar', align: 'center', width: 180}
+                { title: '编号', field: 'id', align: 'center' },
+                { title: '姓名', field: 'sName', align: 'center', width: 80 },
+                { title: '性别', field: 'sSex', align: 'center', width: 80 },
+                { title: '学号', field: 'sNumber', align: 'center', width: 130 },
+                { title: '身高', field: 'sHeight', align: 'center', width: 100 },
+                { title: '体重', field: 'sWeight', align: 'center', width: 100 },
+                { title: '肺活量', field: 'sVitalCapacity', align: 'center', width: 100 },
+                { title: '50米跑', field: 'run50', align: 'center', width: 100 },
+                { title: '立定跳远', field: 'standingLongJump', align: 'center', width: 100 },
+                { title: '坐位体前屈', field: 'sittingForward', align: 'center', width: 100 },
+                { title: '800米跑', field: 'run800', align: 'center', width: 100 },
+                { title: '1000米跑', field: 'run1000', align: 'center', width: 100 },
+                { title: '一分钟仰卧起坐', field: 'oneMinuteSitUps', align: 'center', width: 100 },
+                { title: '引体向上', field: 'pullUP', align: 'center', width: 100 },
+                { title: '操作', toolbar: '#user-bar', align: 'center', width: 240 }
+
             ]
         ]
+
+
 
         // 渲染表格数据
         table.render({
@@ -126,9 +137,8 @@
             page: true,
             cols: cols,
             skin: 'line',
-            toolbar: '#user-toolbar', /*工具栏*/
-            text: {none: '暂无人员信息'},
-            defaultToolbar: [{layEvent: 'refresh', icon: 'layui-icon-refresh'}, 'filter', 'print', 'exports'] /*默认工具栏*/
+            text: { none: '暂无人员信息' },
+            defaultToolbar: [{ layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'filter', 'print', 'exports'] /*默认工具栏*/
         })
 
 
@@ -166,6 +176,13 @@
                 window.edit(obj)
             }
         })
+        table.on('tool(user-table)', function (obj) {
+            if (obj.event === 'view') {
+                window.queryPhysicalData(obj.data); // 传入 obj.data
+                console.log(obj.data);
+            }
+        });
+
 
         table.on('toolbar(user-table)', function (obj) {
             if (obj.event === 'add') {
@@ -181,12 +198,16 @@
             }
         })
 
+
         form.on('submit(user-query)', function (data) {
             window.refresh(data.field)
             return false
         })
 
+
+
         form.on('switch(user-enable)', function (obj) {
+
             let operate
             if (obj.elem.checked) {
                 operate = 'enable'
@@ -195,8 +216,8 @@
             }
             let loading = layer.load()
             $.ajax({
-                url: '{{ url_for('system.user.main') }}' + operate,
-                data: JSON.stringify({userId: this.value}),
+                url: MODULE_PATH + operate,
+                data: JSON.stringify({ userId: this.value }),
                 dataType: 'json',
                 contentType: 'application/json',
                 type: 'put',
@@ -220,7 +241,6 @@
                 content: MODULE_PATH + 'add'
             })
         }
-
         window.edit = function (obj) {
             layer.open({
                 type: 2,
@@ -231,8 +251,42 @@
             })
         }
 
+        window.queryPhysicalData = function (userData) {
+            layer.open({
+                type: 1, // 使用1表示页面内容
+                title: '查询当前用户成绩',
+                shade: 0.1,
+                area: ['700px', '650px'],
+                content:
+                    '<div style="margin-left: 20px;"><strong>姓名：</strong>' + userData.sName + '</div>' +
+                    '<div style="margin-left: 20px;"><strong>学号：</strong>' + userData.sNumber + '</div>' +
+                    '<div style="margin-left: 20px;"><strong>性别：</strong>' + userData.sSex + '</div>' +
+
+
+                    '<table class="layui-table">' +
+                    '<thead>' +
+                    '<tr><th>项目</th><th>结果</th><th>评分</th></tr>' +
+                    '</thead>' +
+                    '<tbody>' +
+                    '<tr><th>身高</th><td>' + userData.sHeight + '</td><td>' + '-' + '</td></tr>' +
+                    '<tr><th>体重</th><td>' + userData.sWeight + '</td><td>' + '-' + '</td></tr>' +
+                    '<tr><th>体重指数（BMI）</th><td>' + '-' + '</td><td>' + userData.score_bmi + '</td></tr>' +
+                    '<tr><th>肺活量</th><td>' + userData.sVitalCapacity + '</td><td>' + userData.score_sVitalCapacity + '</td></tr>' +
+                    '<tr><th>50米跑</th><td>' + userData.run50 + '</td><td>' + userData.score_run50 + '</td></tr>' +
+                    '<tr><th>立定跳远</th><td>' + userData.standingLongJump + '</td><td>' + userData.score_standingLongJump + '</td></tr>' +
+                    '<tr><th>坐位体前屈</th><td>' + userData.sittingForward + '</td><td>' + userData.score_sittingForward + '</td></tr>' +
+                    '<tr><th>800米跑</th><td>' + (userData.run800 === null ? '-' : userData.run800) + '</td><td>' + (userData.score_run800 === null ? '-' : userData.score_run800) + '</td></tr>' +
+                    '<tr><th>1000米跑</th><td>' + (userData.run1000 === null ? '-' : userData.run1000) + '</td><td>' + (userData.score_run1000 === null ? '-' : userData.score_run1000) + '</td></tr>' +
+                    '<tr><th>一分钟仰卧起坐</th><td>' + (userData.oneMinuteSitUps === null ? '-' : userData.oneMinuteSitUps) + '</td><td>' + (userData.score_oneMinuteSitUps === null ? '-' : userData.score_oneMinuteSitUps) + '</td></tr>' +
+                    '<tr><th>引体向上</th><td>' + (userData.pullUP === null ? '-' : userData.pullUP) + '</td><td>' + (userData.score_pullUP === null ? '-' : userData.score_pullUP) + '</td></tr>' +
+                    '<tr><th>总成绩</th><td>' + '-' + '</td><td>' + userData.score_allScore + '</td></tr>' +
+                    '</tbody>' +
+                    '</table>'
+            });
+        }
+
         window.remove = function (obj) {
-            layer.confirm('确定要删除该用户', {icon: 3, title: '提示'}, function (index) {
+            layer.confirm('确定要删除该用户', { icon: 3, title: '提示' }, function (index) {
                 layer.close(index)
                 let loading = layer.load()
                 $.ajax({
@@ -255,8 +309,9 @@
 
 
         window.refresh = function (param) {
-            table.reload('user-table', {where: param})
+            table.reload('user-table', { where: param })
         }
     })
 </script>
+
 </html>

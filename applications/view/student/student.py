@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect,jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import desc
 
@@ -8,17 +8,171 @@ from applications.common.utils.http import table_api, fail_api, success_api
 from applications.common.utils.rights import authorize
 from applications.common.utils.validate import str_escape
 from applications.extensions import db
-from applications.models import Role
-from applications.models import User, AdminLog
+from applications.models import Role, College
+from applications.models import User, AdminLog, Student
 
 bp = Blueprint('student', __name__, url_prefix='/student')
+
+
 
 
 # 体测成绩
 @bp.get('/data/')
 @authorize("student:data")
 def data():
-    return render_template('student/data.html')
+    colleges = College.query.all()
+    return render_template('student/data/main.html',colleges=colleges)
+
+
+
+@bp.get('/data/college')
+@authorize("student:data")
+def dataCollege():
+    colleges = College.query.all()
+    return jsonify([{
+        'id': college.id,
+        'collegeCode': college.collegeCode,
+        'className': college.className
+    } for college in colleges])
+
+
+
+
+# 学生信息
+@bp.get('/data/data')
+@authorize("student:data")
+def dataData():
+    # 获取请求参数 姓名 学号
+    real_name = str_escape(request.args.get('realname', type=str))
+    username = str_escape(request.args.get('username', type=str))
+
+    filters = []
+    if real_name:
+        filters.append(Student.sName.contains(real_name))
+    if username:
+        filters.append(Student.sNumber.contains(username))
+
+    # print(*filters)
+    query = db.session.query(
+        Student
+    ).filter(*filters).layui_paginate()
+
+    return table_api(
+        data=[{
+            'id': student.id,
+            'sName': student.sName,
+            'sNumber': student.sNumber,
+            'sSex': student.sSex,
+            'sHeight': student.sHeight,
+            'sWeight': student.sWeight,
+            'sVitalCapacity': student.sVitalCapacity,
+            'run50': student.run50,
+            'standingLongJump': student.standingLongJump,
+            'sittingForward': student.sittingForward,
+            'run800': student.run800,
+            'run1000': student.run1000,
+            'oneMinuteSitUps': student.oneMinuteSitUps,
+            'pullUP': student.pullUP,
+            'update_at': student.update_at,
+            'score_bmi': student.score_bmi,
+            'score_sVitalCapacity': student.score_sVitalCapacity,
+            'score_run50': student.score_run50,
+            'score_standingLongJump': student.score_standingLongJump,
+            'score_sittingForward': student.score_sittingForward,
+            'score_run800': student.score_run800,
+            'score_run1000': student.score_run1000,
+            'score_oneMinuteSitUps': student.score_oneMinuteSitUps,
+            'score_pullUP': student.score_pullUP,
+            'score_allScore': student.score_allScore,
+            'score_error': student.score_error,
+            'score_errormessage': student.score_errormessage,
+        } for student in query.items],
+        count=query.total)
+
+
+
+
+
+
+@bp.get('/data/add/')
+@authorize("student:add")
+def dataAdd():
+    return render_template('student/data/edit.html')
+
+
+
+#  编辑用户
+@bp.post('/data/save/')
+# @authorize("student:add")
+def dataSave():
+
+    req_json = request.get_json(force=True)
+
+    sNumber = str_escape(req_json.get('sNumber'))
+    sName = str_escape(req_json.get('sName'))
+    sHeight = str_escape(req_json.get('sHeight'))
+    sWeight = str_escape(req_json.get('sWeight'))
+    sVitalCapacity = str_escape(req_json.get('sVitalCapacity'))
+    run50 = str_escape(req_json.get('run50'))
+    standingLongJump = str_escape(req_json.get('standingLongJump'))
+    sittingForward = str_escape(req_json.get('sittingForward'))
+    run800 = str_escape(req_json.get('run800'))
+    run1000 = str_escape(req_json.get('run1000'))
+    oneMinuteSitUps = str_escape(req_json.get('oneMinuteSitUps'))
+    pullUP = str_escape(req_json.get('pullUP'))
+
+
+    if not sNumber or not sName:
+        print(sNumber, sName)
+        return fail_api(msg="学生姓名或学号不能为空")
+
+
+
+    filters = []
+    filters.append(Student.sName.contains(sName))
+    filters.append(Student.sNumber.contains(sNumber))
+
+    student = Student.query.filter(*filters).first()
+    print('AAAAA')
+    print('AAAAA')
+    print('AAAAA')
+    print(student)
+    print('AAAAA')
+    print('AAAAA')
+    print('AAAAA')
+    if not student:
+        return fail_api(msg="学生不存在")
+
+    update_data = {}
+    if sHeight:
+        update_data['sHeight'] = sHeight
+    if sWeight:
+        update_data['sWeight'] = sWeight
+    if sVitalCapacity:
+        update_data['sVitalCapacity'] = sVitalCapacity
+    if run50:
+        update_data['run50'] = run50
+    if standingLongJump:
+        update_data['standingLongJump'] = standingLongJump
+    if sittingForward:
+        update_data['sittingForward'] = sittingForward
+    if run800:
+        update_data['run800'] = run800
+    if run1000:
+        update_data['run1000'] = run1000
+    if oneMinuteSitUps:
+        update_data['oneMinuteSitUps'] = oneMinuteSitUps
+    if pullUP:
+        update_data['pullUP'] = pullUP
+       
+    result = Student.query.filter_by(sName=sName, sNumber=sNumber).update(update_data)
+    if result == 0:
+        print(f"调试信息: 更新失败，未找到匹配的学生记录，sName: {sName}, sNumber: {sNumber}")
+    else:
+        print(f"调试信息: 更新成功，更新了 {result} 条记录")
+
+    db.session.commit()
+    return success_api(msg="添加成功")
 
 
 
@@ -33,25 +187,161 @@ def show_small():
 
 
 
+@bp.get('/add/')
+@authorize("student:add")
+def add():
+    return redirect('/student/info/add/')
+
+
+
+
+
 
 # 学生信息
 @bp.get('/info/')
 @authorize("student:info")
 def info():
-    # return render_template('student/info.html')
     return render_template('student/main.html')
 
 
 
 
+# 学生信息
+@bp.get('/info/college')
+@authorize("student:info")
+def infoCollege():
+    colleges = College.query.all()
+    return jsonify([{
+        'id': college.id,
+        'collegeCode': college.collegeCode,
+        'className': college.className
+    } for college in colleges])
+
+
+
+
+# 学生信息
+@bp.get('/info/data')
+@authorize("student:info")
+def infoData():
+    # 获取请求参数 姓名 学号
+    real_name = str_escape(request.args.get('realname', type=str))
+    username = str_escape(request.args.get('username', type=str))
+
+    filters = []
+    if real_name:
+        filters.append(Student.sName.contains(real_name))
+    if username:
+        filters.append(Student.sNumber.contains(username))
+
+    # print(*filters)
+    query = db.session.query(
+        Student
+    ).filter(*filters).layui_paginate()
+
+    return table_api(
+        data=[{
+            'id': student.id,
+            'sName': student.sName,
+            'sNumber': student.sNumber,
+            'sSex': student.sSex,
+            'collegeCode': student.collegeCode,
+            'grade': student.grade,
+            'classNum': student.classNum,
+            'enable': student.enable,
+            'sBirthDate': student.sBirthDate,
+        } for student in query.items],
+        count=query.total)
+
+
+#  编辑用户
+@bp.get('/info/edit/<int:id>')
+@authorize("student:info")
+def infoEdit(id):
+    student = curd.get_one_by_id(Student, id)
+    colleges = College.query.all()
+    return render_template('student/edit.html', student=student, colleges=colleges)
+
+
+#  编辑用户
+@bp.put('/info/update/')
+@authorize("student:info")
+def infoUpdate():
+    req_json = request.get_json(force=True)
+    id = str_escape(req_json.get("userId"))
+    sNumber = str_escape(req_json.get('sNumber'))
+    sName = str_escape(req_json.get('sName'))
+    sSex = str_escape(req_json.get('sSex'))
+    collegeCode = str_escape(req_json.get('collegeCode'))
+    grade = str_escape(req_json.get('grade'))
+    classNum = str_escape(req_json.get('classNum'))
+    sBirthDate = str_escape(req_json.get('sBirthDate'))
+    Student.query.filter_by(id=id).update(
+        {'sNumber': sNumber, 'sName': sName, 'sSex': sSex, 'collegeCode': collegeCode, 'grade': grade,
+         'classNum': classNum, 'sBirthDate': sBirthDate})
+    db.session.commit()
+    return success_api(msg="更新成功")
+
+
+# 启用用户
+@bp.put('/info/enable')
+def enable():
+    _id = request.get_json(force=True).get('userId')
+    if _id:
+        res = enable_status(model=Student, id=_id)
+        if not res:
+            return fail_api(msg="出错啦")
+        return success_api(msg="启动成功")
+    return fail_api(msg="数据错误")
+
+
+# 禁用用户
+@bp.put('/info/disable')
+def dis_enable():
+    _id = request.get_json(force=True).get('userId')
+    if _id:
+        res = disable_status(model=Student, id=_id)
+        if not res:
+            return fail_api(msg="出错啦")
+        return success_api(msg="禁用成功")
+    return fail_api(msg="数据错误")
+
 
 # 成绩录入
-@bp.get('/addpage/')
-@authorize("student:addpage")
-def addpage():
-    return render_template('student/addpage.html')
+@bp.get('/info/add/')
+@authorize("student:add")
+def infoAdd():
+    colleges = College.query.all()
+    return render_template('student/add.html', colleges=colleges)
 
 
+@bp.post('/info/save/')
+@authorize("student:info")
+def infoSave():
+    req_json = request.get_json(force=True)
+
+    sNumber = str_escape(req_json.get('sNumber'))
+    sName = str_escape(req_json.get('sName'))
+    password = str_escape(req_json.get('password'))
+    sSex = str_escape(req_json.get('sSex'))
+    collegeCode = str_escape(req_json.get('collegeCode'))
+    grade = str_escape(req_json.get('grade'))
+    classNum = str_escape(req_json.get('classNum'))
+    sBirthDate = str_escape(req_json.get('sBirthDate'))
+
+    if not sNumber or not sName or not password:
+        return fail_api(msg="账号姓名密码不得为空")
+
+    if bool(Student.query.filter_by(sNumber=sNumber).count()):
+        return fail_api(msg="该学号学生已经存在")
+
+    student = Student(sNumber=sNumber, sName=sName, enable=1, sSex=sSex, collegeCode=collegeCode, grade=grade,
+                      classNum=classNum, sBirthDate=sBirthDate)
+    student.set_password(password)
+    db.session.add(student)
+
+    db.session.commit()
+    return success_api(msg="增加成功")
 
 
 
@@ -65,207 +355,3 @@ def show():
 
 
 
-# #   用户分页查询
-# @bp.get('/data')
-# @authorize("system:data:main")
-# def data():
-#     # 获取请求参数
-#     real_name = str_escape(request.args.get('realname', type=str))
-
-#     username = str_escape(request.args.get('username', type=str))
-
-#     filters = []
-#     if real_name:
-#         filters.append(User.realname.contains(real_name))
-#     if username:
-#         filters.append(User.username.contains(username))
-
-#     # print(*filters)
-#     query = db.session.query(
-#         User
-#     ).filter(*filters).layui_paginate()
-
-#     return table_api(
-#         data=[{
-#             'id': data.id,
-#             'username': data.username,
-#             'realname': data.realname,
-#             'enable': data.enable,
-#             'create_at': data.create_at,
-#             'update_at': data.update_at,
-#         } for data in query.items],
-#         count=query.total)
-
-# # 用户增加
-# @bp.get('/add')
-# @authorize("system:data:add", log=True)
-# def add():
-#     roles = Role.query.all()
-#     return render_template('system/data/add.html', roles=roles)
-
-
-# @bp.post('/save')
-# @authorize("system:data:add", log=True)
-# def save():
-#     req_json = request.get_json(force=True)
-#     a = req_json.get("roleIds")
-#     username = str_escape(req_json.get('username'))
-#     real_name = str_escape(req_json.get('realName'))
-#     password = str_escape(req_json.get('password'))
-#     role_ids = a.split(',')
-
-#     if not username or not real_name or not password:
-#         return fail_api(msg="账号姓名密码不得为空")
-
-#     if bool(User.query.filter_by(username=username).count()):
-#         return fail_api(msg="用户已经存在")
-
-#     data = User(username=username, realname=real_name, enable=1)
-#     data.set_password(password)
-#     db.session.add(data)
-#     roles = Role.query.filter(Role.id.in_(role_ids)).all()
-#     for r in roles:
-#         data.role.append(r)
-
-#     db.session.commit()
-#     return success_api(msg="增加成功")
-
-
-# # 删除用户
-# @bp.delete('/remove/<int:id>')
-# @authorize("system:data:remove", log=True)
-# def delete(id):
-#     data = User.query.filter_by(id=id).first()
-#     data.role = []
-
-#     res = User.query.filter_by(id=id).delete()
-#     db.session.commit()
-#     if not res:
-#         return fail_api(msg="删除失败")
-#     return success_api(msg="删除成功")
-
-
-# #  编辑用户
-# @bp.get('/edit/<int:id>')
-# @authorize("system:data:edit", log=True)
-# def edit(id):
-#     data = curd.get_one_by_id(User, id)
-#     roles = Role.query.all()
-#     checked_roles = []
-#     for r in data.role:
-#         checked_roles.append(r.id)
-#     return render_template('system/data/edit.html', data=data, roles=roles, checked_roles=checked_roles)
-
-
-# #  编辑用户
-# @bp.put('/update')
-# @authorize("system:data:edit", log=True)
-# def update():
-#     req_json = request.get_json(force=True)
-#     a = str_escape(req_json.get("roleIds"))
-#     id = str_escape(req_json.get("userId"))
-#     username = str_escape(req_json.get('username'))
-#     real_name = str_escape(req_json.get('realName'))
-#     role_ids = a.split(',')
-#     User.query.filter_by(id=id).update({'username': username, 'realname': real_name})
-#     u = User.query.filter_by(id=id).first()
-
-#     roles = Role.query.filter(Role.id.in_(role_ids)).all()
-#     u.role = roles
-
-#     db.session.commit()
-#     return success_api(msg="更新成功")
-
-
-# # 个人中心
-# @bp.get('/center')
-# @login_required
-# def center():
-#     user_info = current_user
-#     user_logs = AdminLog.query.filter_by(url='/passport/login').filter_by(uid=current_user.id).order_by(
-#         desc(AdminLog.create_time)).limit(10)
-#     return render_template('system/data/center.html', user_info=user_info, user_logs=user_logs)
-
-
-# # 修改头像
-# @bp.get('/profile')
-# @login_required
-# def profile():
-#     return render_template('system/data/profile.html')
-
-
-# # 修改头像
-# @bp.put('/updateAvatar')
-# @login_required
-# def update_avatar():
-#     url = request.get_json(force=True).get("avatar").get("src")
-#     r = User.query.filter_by(id=current_user.id).update({"avatar": url})
-#     db.session.commit()
-#     if not r:
-#         return fail_api(msg="出错啦")
-#     return success_api(msg="修改成功")
-
-
-# # 修改当前用户信息
-# @bp.put('/updateInfo')
-# @login_required
-# def update_info():
-#     req_json = request.get_json(force=True)
-#     r = User.query.filter_by(id=current_user.id).update(
-#         {"realname": req_json.get("realName"), "remark": req_json.get("details")})
-#     db.session.commit()
-#     if not r:
-#         return fail_api(msg="出错啦")
-#     return success_api(msg="更新成功")
-
-
-# # 修改当前用户密码
-# @bp.get('/editPassword')
-# @login_required
-# def edit_password():
-#     return render_template('system/data/edit_password.html')
-
-
-# # 修改当前用户密码
-# @bp.put('/editPassword')
-# @login_required
-# def edit_password_put():
-#     res_json = request.get_json(force=True)
-#     if res_json.get("newPassword") == '':
-#         return fail_api("新密码不得为空")
-#     if res_json.get("newPassword") != res_json.get("confirmPassword"):
-#         return fail_api("两次密码不一样")
-#     data = current_user
-#     is_right = data.validate_password(res_json.get("oldPassword"))
-#     if not is_right:
-#         return fail_api("旧密码错误")
-#     data.set_password(res_json.get("newPassword"))
-#     db.session.add(data)
-#     db.session.commit()
-#     return success_api("更改成功")
-
-
-# # 启用用户
-# @bp.put('/enable')
-# @authorize("system:data:edit", log=True)
-# def enable():
-#     _id = request.get_json(force=True).get('userId')
-#     if _id:
-#         res = enable_status(model=User, id=_id)
-#         if not res:
-#             return fail_api(msg="出错啦")
-#         return success_api(msg="启动成功")
-#     return fail_api(msg="数据错误")
-
-
-# # 禁用用户
-# @bp.put('/disable')
-# @authorize("system:data:edit", log=True)
-# def dis_enable():
-#     _id = request.get_json(force=True).get('userId')
-#     if _id:
-#         res = disable_status(model=User, id=_id)
-#         if not res:
-#             return fail_api(msg="出错啦")
-#         return success_api(msg="禁用成功")
-#     return fail_api(msg="数据错误")

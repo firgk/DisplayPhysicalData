@@ -1,7 +1,11 @@
 rm -rf migrations/
 rm -f ../pear.db
-python makeCollege.py
-python makeStudent.py
+
+echo !!!!!! 需要构建数据
+python makedata/makeCollege.py
+python makedata/makeStudent.py
+echo !!!!!!需要构建数据
+
 flask db init
 flask db migrate
 flask db upgrade

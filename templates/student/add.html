@@ -26,73 +26,54 @@
             </div>
           </div>
           <div class="layui-form-item">
-            <label class="layui-form-label">身高</label>
+            <label class="layui-form-label">密码</label>
             <div class="layui-input-block">
-              <input type="text" name="sHeight" lay-verify="title" autocomplete="off" placeholder="身高"
+              <input type="password" name="password" lay-verify="title" autocomplete="off" placeholder="用户密码"
                 class="layui-input">
             </div>
           </div>
           <div class="layui-form-item">
-            <label class="layui-form-label">体重</label>
+            <label class="layui-form-label">性别</label>
             <div class="layui-input-block">
-              <input type="text" name="sWeight" lay-verify="title" autocomplete="off" placeholder="体重"
-                class="layui-input">
+              <input type="text"  name="sSex" lay-verify="title" autocomplete="off"
+                placeholder="性别" class="layui-input">
+            </div>
+          </div>
+
+          <!-- 可复用 -->
+          <div class="layui-form-item">
+            <label class="layui-form-label">学院</label>
+            <div class="layui-input-block">
+
+              <select name="collegeCode">
+                {% for college in colleges %}
+                <option value="{{ college.collegeCode }}" title="{{ college.className }}">{{ college.className }}
+                </option>
+                {% endfor %}
+              </select>
+
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <label class="layui-form-label">年级</label>
+            <div class="layui-input-block">
+              <input type="text" name="grade" lay-verify="title" autocomplete="off"
+                placeholder="年级" class="layui-input">
             </div>
           </div>
           <div class="layui-form-item">
-            <label class="layui-form-label">肺活量</label>
+            <label class="layui-form-label">班级</label>
             <div class="layui-input-block">
-              <input type="text" name="sVitalCapacity" lay-verify="title" autocomplete="off" placeholder="肺活量"
-                class="layui-input">
+              <input type="text"  name="classNum" lay-verify="title" autocomplete="off"
+                placeholder="班级" class="layui-input">
             </div>
           </div>
           <div class="layui-form-item">
-            <label class="layui-form-label">50米跑</label>
+            <label class="layui-form-label">出生日期</label>
             <div class="layui-input-block">
-              <input type="text" name="run50" lay-verify="title" autocomplete="off" placeholder="50米跑"
-                class="layui-input">
-            </div>
-          </div>
-          <div class="layui-form-item">
-            <label class="layui-form-label">立定跳远</label>
-            <div class="layui-input-block">
-              <input type="text" name="standingLongJump" lay-verify="title" autocomplete="off" placeholder="立定跳远"
-                class="layui-input">
-            </div>
-          </div>
-          <div class="layui-form-item">
-            <label class="layui-form-label">坐位体前屈</label>
-            <div class="layui-input-block">
-              <input type="text" name="sittingForward" lay-verify="title" autocomplete="off" placeholder="坐位体前屈"
-                class="layui-input">
-            </div>
-          </div>
-          <div class="layui-form-item">
-            <label class="layui-form-label">800米跑</label>
-            <div class="layui-input-block">
-              <input type="text" name="run800" lay-verify="title" autocomplete="off" placeholder="800米跑"
-                class="layui-input">
-            </div>
-          </div>
-          <div class="layui-form-item">
-            <label class="layui-form-label">1000米跑</label>
-            <div class="layui-input-block">
-              <input type="text" name="run1000" lay-verify="title" autocomplete="off" placeholder="1000米跑"
-                class="layui-input">
-            </div>
-          </div>
-          <div class="layui-form-item">
-            <label class="layui-form-label">一分钟仰卧起坐</label>
-            <div class="layui-input-block">
-              <input type="text" name="oneMinuteSitUps" lay-verify="title" autocomplete="off" placeholder="一分钟仰卧起坐"
-                class="layui-input">
-            </div>
-          </div>
-          <div class="layui-form-item">
-            <label class="layui-form-label">引体向上</label>
-            <div class="layui-input-block">
-              <input type="text" name="pullUP" lay-verify="title" autocomplete="off" placeholder="引体向上"
-                class="layui-input">
+              <input type="text"  name="sBirthDate" lay-verify="title"
+                autocomplete="off" placeholder="格式: XXXX-XX-XX" class="layui-input">
             </div>
           </div>
 
@@ -121,10 +102,10 @@
       form.on('submit(user-save)', function (data) {
 
         $.ajax({
-          url: '/student/data/save',
+          url: '/student/info/save',
           data: JSON.stringify(data.field),
           dataType: 'json',
-          contentType: 'application/json', 
+          contentType: 'application/json',
           type: 'post',
           success: function (result) {
             if (result.success) {

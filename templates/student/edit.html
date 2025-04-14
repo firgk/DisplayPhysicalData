@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+<head>
+    <title>用户编辑</title>
+    {% include 'system/common/header.html' %}
+</head>
+
+<body>
+    <form class="layui-form" action="">
+        <div class="mainBox">
+            <div class="main-container">
+                <div class="main-container">
+                    <div class="layui-form-item layui-hide">
+                        <label class="layui-form-label">编号</label>
+                        <div class="layui-input-block">
+                            <input type="text" value="{{ student.id }}" name="userId" lay-verify="title"
+                                autocomplete="off" placeholder="用户编号" class="layui-input">
+                        </div>
+                    </div>
+                    <!-- 可复用 -->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账号</label>
+                        <div class="layui-input-block">
+                            <input type="text" value="{{ student.sNumber }}" name="sNumber" lay-verify="title"
+                                autocomplete="off" placeholder="登录账号" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">姓名</label>
+                        <div class="layui-input-block">
+                            <input type="text" value="{{ student.sName }}" name="sName" lay-verify="title"
+                                autocomplete="off" placeholder="用户姓名" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">性别</label>
+                        <div class="layui-input-block">
+                            <input type="text" value="{{ student.sSex }}" name="sSex" lay-verify="title"
+                                autocomplete="off" placeholder="性别" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">学院</label>
+                        <div class="layui-input-block">
+
+                            <select name="collegeCode">
+                                {% for college in colleges %}
+                                <option value="{{ college.collegeCode }}" title="{{ college.className }}"
+                                    {% if college.collegeCode == student.collegeCode %} selected {% endif %}>
+                                    {{ college.className }}
+                                </option>
+                                {% endfor %}
+                            </select>
+
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">年级</label>
+                        <div class="layui-input-block">
+                            <input type="text" value="{{ student.grade }}" name="grade" lay-verify="title"
+                                autocomplete="off" placeholder="年级" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">班级</label>
+                        <div class="layui-input-block">
+                            <input type="text" value="{{ student.classNum }}" name="classNum" lay-verify="title"
+                                autocomplete="off" placeholder="班级" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">出生日期</label>
+                        <div class="layui-input-block">
+                            <input type="text" value="{{ student.sBirthDate }}" name="sBirthDate" lay-verify="title"
+                                autocomplete="off" placeholder="出生日期" class="layui-input">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="bottom">
+            <div class="button-container">
+                <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="user-update">
+                    <i class="layui-icon layui-icon-ok"></i>
+                    提交
+                </button>
+                <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">
+                    <i class="layui-icon layui-icon-refresh"></i>
+                    重置
+                </button>
+            </div>
+        </div>
+    </form>
+    {% include 'system/common/footer.html' %}
+    <script>
+        layui.use(['form', 'jquery'], function () {
+            let form = layui.form
+            let $ = layui.jquery
+
+            form.on('submit(user-update)', function (data) {
+                $.ajax({
+                    url: '/student/info/update/',
+                    data: JSON.stringify(data.field),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    type: 'put',
+                    success: function (result) {
+                        if (result.success) {
+                            layer.msg(result.msg, { icon: 1, time: 1000 }, function () {
+                                parent.layer.close(parent.layer.getFrameIndex(window.name))//关闭当前页
+                                parent.layui.table.reload('user-table')
+                            })
+                        } else {
+                            layer.msg(result.msg, { icon: 2, time: 1000 })
+                        }
+                    }
+                })
+                return false
+            })
+        })
+    </script>
+</body>
+
+</html>

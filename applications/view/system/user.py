@@ -23,7 +23,7 @@ def main():
 
 #   用户分页查询
 @bp.get('/data/')
-# @authorize("system:user:main")
+@authorize("system:user:main")
 def data():
     # 获取请求参数
     real_name = str_escape(request.args.get('realname', type=str))
@@ -51,6 +51,7 @@ def data():
             'update_at': user.update_at,
         } for user in query.items],
         count=query.total)
+
 
 # 用户增加
 @bp.get('/add')

@@ -181,7 +181,7 @@ def generate_data(num):
 
 
 # 生成1000条数据
-num = 11
+num = 1000
 datas = generate_data(num)
 
 
@@ -232,7 +232,7 @@ for data in score_data:
     ),"""
 output = output.rstrip(',') + "\n]"
 
-print(output)
+# print(output)
 
 with open('../applications/common/script/student.py', 'w', encoding='utf-8') as file:
     file.write('from applications.models import Student\n')

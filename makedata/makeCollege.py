@@ -60,7 +60,7 @@ for student in colleges:
     ),"""
 output = output.rstrip(',') + "\n]"
 
-print(output)
+# print(output)
 
 
 with open('../applications/common/script/college.py', 'w', encoding='utf-8') as file:
