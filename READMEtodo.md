@@ -34,6 +34,7 @@ doing
 
 
 
+view/system/rights.py 可以修改部分设置
 
 
 

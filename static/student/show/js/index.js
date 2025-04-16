@@ -1,8 +1,213 @@
 // 立即执行函数，防止变量污染 (function() {})();
 
-// 柱形图-就业行业
 
-// 柱状图模块1
+
+// main head
+(function () {
+  $.ajax({
+    url: '/api/completion_statistics',  // 使用我们新创建的API接口
+    method: 'GET',
+    dataType: 'json',
+    success: function(data) {
+        // 更新完成和未完成的数据显示
+        $('#data1').text(data.completed);
+        $('#data2').text(data.notCompleted);
+    },
+    error: function(xhr, status, error) {
+        console.error('获取数据时出错:', error);
+        // 处理错误，显示错误提示
+        $('#data1').text('获取失败');
+        $('#data2').text('获取失败');
+    }
+  });
+})();
+
+
+
+
+
+// 各院系在校生参测率
+// main body
+(function () {
+  var myChart = echarts.init(document.querySelector('.map .chart'));
+
+  // 定义颜色数组
+  var colors = ['#3282b8', '#66bb6a', '#ff9800', '#9c27b0', '#e57373', '#00bcd4', '#8bc34a', '#f44336', '#03a9f4', '#9e9e9e', '#ff5722', '#607d8b', '#4caf50', '#f06292', '#2196f3', '#795548', '#ffc107', '#3f51b5', '#009688', '#cddc39', '#f57c00', '#81d4fa', '#f50057', '#673ab7', '#455a64', '#7e57c2', '#00e676', '#90a4ae', '#ff8a80', '#0091ea', '#82b1ff', '#4db6ac', '#d1c4e9', '#00b0ff', '#b2dfdb', '#000000'];
+
+  // 从接口获取数据
+  function fetchData() {
+    $.ajax({
+      url: '/api/college_participation_rate',
+      method: 'GET',
+      dataType: 'json',
+      success: function(response) {
+        var data = response.data;
+        
+        var option = {
+          title: {
+            text: '各院系在校生参测率',
+            left: '36%',
+            textStyle: {
+              color: "#FFFFFF"
+            },
+          },
+          xAxis: {
+            type: 'value',
+            axisLabel: {
+              textStyle: {
+                color: '#FFFFFF'
+              }
+            },
+          },
+          grid: {
+            top: 48,
+            left: 155,
+            right: 50,
+            bottom: 50,
+          },
+          yAxis: {
+            type: 'category',
+            data: data.map(item => item.name),
+            axisLabel: {
+              textStyle: {
+                color: '#FFFFFF'
+              }
+            },
+          },
+          series: [{
+            name: '参测率',
+            type: 'bar',
+            data: data.map(item => item.value),
+            label: {
+              show: true,
+              position: 'insideRight',
+              formatter: '{c}%',  // 添加百分号
+              color: '#FFFFFF'
+            },
+            itemStyle: {
+              color: function(params) {
+                return colors[params.dataIndex % colors.length];  // 使用取模运算确保不会超出颜色数组范围
+              }
+            }
+          }]
+        };
+
+        myChart.setOption(option);
+      },
+      error: function(xhr, status, error) {
+        console.error('获取数据失败:', error);
+      }
+    });
+  }
+
+  // 初次加载数据
+  fetchData();
+
+  // 让图表随屏幕自适应
+  window.addEventListener('resize', function() {
+    myChart.resize();
+  });
+})();
+
+
+
+
+// 柱状图1
+// 各年级成绩分布对比
+// 11
+(function () {
+  var myChart = echarts.init(document.querySelector('.bar .chart'));
+  
+  // 定义一个函数从接口获取数据
+  function fetchData() {
+    $.ajax({
+      url: '/api/grade_score_distribution',
+      method: 'GET',
+      dataType: 'json',
+      success: function (response) {
+        var data = response.data;
+        var option = {
+          color: ['#FF0000', '#ffff00', '#00FA9A', '#0096ff'],
+          legend: {
+            data: ['优秀', '良好', '及格', '不及格'],
+            textStyle: {
+              color: '#ffffff'
+            },
+            left: 'center',
+            top: '8%',
+            padding: [5, 10]
+          },
+          xAxis: {
+            type: 'value',
+            name: '',
+            textStyle: {
+              color: '#ffffff'
+            }
+          },
+          yAxis: {
+            type: 'category',
+            data: ['大一', '大二', '大三', '大四'],
+            textStyle: {
+              color: '#ffffff'
+            }
+          },
+          series: [
+            {
+              name: '优秀',
+              type: 'bar',
+              data: data['优秀'],
+              stack: '总量'
+            },
+            {
+              name: '良好',
+              type: 'bar',
+              data: data['良好'],
+              stack: '总量'
+            },
+            {
+              name: '及格',
+              type: 'bar',
+              data: data['及格'],
+              stack: '总量'
+            },
+            {
+              name: '不及格',
+              type: 'bar',
+              data: data['不及格'],
+              stack: '总量'
+            }
+          ],
+          barWidth: 8,
+          textStyle: {
+            color: '#ffffff'
+          }
+        };
+
+        myChart.setOption(option);
+      },
+      error: function (xhr, status, error) {
+        console.error('获取数据失败:', error);
+      }
+    });
+  }
+
+  // 初次加载数据
+  fetchData();
+
+  // 让图表随屏幕自适应
+  window.addEventListener('resize', function () {
+    myChart.resize();
+  });
+})();
+
+
+
+
+
+// 柱状图2
+//不同群体体测平均成绩
+// 12
+
 (function () {
   // 1.实例化对象
   var myChart = echarts.init(document.querySelector(".bar2 .chart"));
@@ -88,126 +293,121 @@
 
 
 
-
-
-
-// 折线图模块1
+// 折线图1
+// 各年级平均BMI
+// 21
 (function () {
-  // 年份对应数据
-  var yearData = [{
-    data: [
-      // 两个数组是因为有两条线
-      [24, 40, 101, 134],
-      [40, 64, 191, 324],
-      [180, 200, 180, 79]
-    ]
-  }];
-
   var myChart = echarts.init(document.querySelector(".line .chart"));
 
-  var option = {
-    // 修改两条线的颜色
-    color: ['#00f2f1', '#ed3f35','#FFA500'],
-    tooltip: {
-      trigger: 'axis'
-    },
-    // 图例组件
-    legend: {
-      // 当serise 有name值时， legend 不需要写data
-      // 修改图例组件文字颜色
-      textStyle: {
-        color: '#4c9bfd'
-      },
-      right: '10%',
-    },
-    grid: {
-      top: "20%",
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true,
-      show: true, // 显示边框
-      borderColor: '#012f4a' // 边框颜色
-    },
-    xAxis: {
-      type: 'category',
-      boundaryGap: false, // 去除轴间距
-      data: ['大一', '大二', '大三', '大四'],
-      // 去除刻度线
-      axisTick: {
-        show: false
-      },
-      axisLabel: {
-        color: "#4c9bfb" // x轴文本颜色
-      },
-      axisLine: {
-        show: false // 去除轴线
-      }
-    },
-    yAxis: {
-      type: 'value',
-      // 去除刻度线
-      axisTick: {
-        show: false
-      },
-      axisLabel: {
-        color: "#4c9bfb" // x轴文本颜色
-      },
-      axisLine: {
-        show: false // 去除轴线
-      },
-      splitLine: {
-        lineStyle: {
-          color: "#012f4a"
-        }
-      }
-    },
-    series: [{
-      type: 'line',
-      smooth: true, // 圆滑的线
-      name: '平均BMI',
-      data: yearData[0].data[0]
-    },
-    {
-      type: 'line',
-      smooth: true, // 圆滑的线
-      name: '平均体重',
-      data: yearData[0].data[1]
-    },
-    {
-      type: 'line',
-      smooth: true, // 圆滑的线
-      name: '平均身高',
-      data: yearData[0].data[2]
-    }
-    ]
-  };
+  // 定义一个函数从接口获取数据
+  function fetchData() {
+    $.ajax({
+      url: '/api/average_bmi_data', // 替换为你的实际接口地址
+      method: 'GET',
+      dataType: 'json',
+      success: function (response) {
+        // 假设返回的数据结构为 { data: { bmi: [...], weight: [...], height: [...] } }
+        var yearData = response.data;
+        var option = {
+          // 修改两条线的颜色
+          color: ['#00f2f1', '#ed3f35', '#FFA500'],
+          tooltip: {
+            trigger: 'axis'
+          },
+          // 图例组件
+          legend: {
+            textStyle: {
+              color: '#4c9bfd'
+            },
+            right: '10%',
+          },
+          grid: {
+            top: "20%",
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true,
+            show: true,
+            borderColor: '#012f4a'
+          },
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: ['大一', '大二', '大三', '大四'],
+            axisTick: {
+              show: false
+            },
+            axisLabel: {
+              color: "#4c9bfb"
+            },
+            axisLine: {
+              show: false
+            }
+          },
+          yAxis: {
+            type: 'value',
+            axisTick: {
+              show: false
+            },
+            axisLabel: {
+              color: "#4c9bfb"
+            },
+            axisLine: {
+              show: false
+            },
+            splitLine: {
+              lineStyle: {
+                color: "#012f4a"
+              }
+            }
+          },
+          series: [{
+            type: 'line',
+            smooth: true,
+            name: '平均BMI',
+            data: yearData.bmi
+          },
+          {
+            type: 'line',
+            smooth: true,
+            name: '平均体重',
+            data: yearData.weight
+          },
+          {
+            type: 'line',
+            smooth: true,
+            name: '平均身高',
+            data: yearData.height
+          }
+          ]
+        };
 
-  myChart.setOption(option);
+        myChart.setOption(option);
+      },
+      error: function (xhr, status, error) {
+        console.error('获取数据失败:', error);
+      }
+    });
+  }
 
-  // 4.让图表随屏幕自适应
+  // 初次加载数据
+  fetchData();
+
+  // 让图表随屏幕自适应
   window.addEventListener('resize', function () {
     myChart.resize();
-  })
-
-  // 5.点击切换2020 和 2021 的数据
-  $('.line h2 a').on('click', function () {
-    // console.log($(this).index());
-    // 点击a 之后 根据当前a的索引号 找到对应的 yearData 相关对象
-    // console.log(yearData[$(this).index()]);
-    var obj = yearData[$(this).index()];
-    option.series[0].data = obj.data[0];
-    option.series[1].data = obj.data[1];
-    // 选中年份高亮
-    $('.line h2 a').removeClass('a-active');
-    $(this).addClass('a-active');
-
-    // 需要重新渲染
-    myChart.setOption(option);
-  })
+  });
 })();
 
-// 折线图模块2
+
+
+
+
+
+// 折线图2
+// 体测成绩时间序列趋势
+// 22
+
 (function () {
   var myChart = echarts.init(document.querySelector('.line2 .chart'));
 
@@ -372,10 +572,12 @@
 
 
 // 饼形图1
+//体测数据异常值占比
+// 31
 (function () {
   // 定义一个异步函数来获取数据
   $.ajax({
-    url: 'http://localhost:8000/api', // 替换为你的数据接口
+    url: 'http://127.0.0.1:8000/api/distribution_of_actual_test_scores', // 替换为你的数据接口
     type: 'GET', // 请求类型
     dataType: 'json', // 期望的返回数据类型
     success: function (data) {
@@ -433,7 +635,11 @@
 
 
 
+
+
 // 饼形图2
+// 体测数据异常值占比
+// 33
 (function () {
   var myChart = echarts.init(document.querySelector('.pie2 .chart'));
   var option = {
@@ -507,163 +713,5 @@
   })
 })();
 
-
-
-// 各年级成绩分布对比
-
-// 饼形图2
-(function () {
-  var myChart = echarts.init(document.querySelector('.bar .chart'));
-  // 配置项
-  var option = {
-    color: ['#FF0000', '#ffff00', '#00FA9A', '#0096ff'], // 设置颜色
-
-    legend: {
-      data: ['优秀', '良好', '及格', '不及格'],
-      textStyle: { // 设置图例文本样式
-        color: '#ffffff' // 设置图例文本颜色为白色
-      },
-      left: 'center',
-      top: '8%', // 调整图例在垂直方向上的位置，距离顶部 15%
-      padding: [5, 10] // 调整图例的内边距，[上下边距, 左右边距]
-    },
-    xAxis: {
-      type: 'value',
-      name: '',
-      textStyle: { // 设置标题样式
-        color: '#ffffff' // 设置标题文本颜色为白色
-      }
-    },
-    yAxis: {
-      type: 'category',
-      data: ['大一', '大二', '大三', '大四'],
-      textStyle: { // 设置标题样式
-        color: '#ffffff' // 设置标题文本颜色为白色
-      }
-    },
-    series: [
-      {
-        name: '优秀',
-        type: 'bar',
-        data: [3, 19, 9, 5],
-        stack: '总量'
-      },
-      {
-        name: '良好',
-        type: 'bar',
-        data: [136, 220, 110, 46],
-        stack: '总量'
-      },
-      {
-        name: '及格',
-        type: 'bar',
-        data: [2331, 2200, 2108, 1795],
-        stack: '总量'
-      },
-      {
-        name: '不及格',
-        type: 'bar',
-        data: [484, 480, 495, 866],
-        stack: '总量'
-      }
-    ],
-    barWidth: 8, // 设置柱子宽度
-    textStyle: { // 设置标题样式
-      color: '#ffffff' // 设置标题文本颜色为白色
-    }
-  };
-
-  myChart.setOption(option);
-  window.addEventListener('resize', function () {
-    myChart.resize();
-  })
-})();
-
-
-
-
-
-
-(function () {
-  var myChart = echarts.init(document.querySelector('.map .chart'));
-
-  // 假设的数据，格式为[{name: '院系名称', value: 参测率}, ...]
-  var data = [
-    { name: '中国语言文学系', value: 96.33 },
-    { name: '中国语言文学系', value: 92.95 },
-    { name: '政治与国际关系学院', value: 92.95 },
-    { name: '政治与国际关系学院', value: 92.95 },
-    { name: '中国语言文学系', value: 92.95 },
-    { name: '政治与国际关系学院', value: 92.95 },
-    { name: '计算机科学与技术学院', value: 92.95 },
-    { name: '政治与国际关系学院', value: 92.95 },
-    { name: '农业工程与食品科学学院', value: 92.95 },
-    { name: '政治与国际关系学院', value: 92.95 },
-    { name: '政治与国际关系学院', value: 92.95 },
-    { name: '政治与国际关系学院', value: 92.95 },
-    { name: '政治与国际关系学院', value: 92.95 },
-    { name: '哲学系', value: 95.71 },
-    // 此处省略其他院系数据，按实际情况补充完整
-    { name: '法学院', value: 95.09 }
-  ];
-
-  // 定义颜色数组，颜色数量要和数据项数量对应，不够可扩展
-  var colors = ['#3282b8', '#66bb6a', '#ff9800', '#9c27b0', '#e57373', '#00bcd4', '#8bc34a', '#f44336', '#03a9f4', '#9e9e9e', '#ff5722', '#607d8b', '#4caf50', '#f06292', '#2196f3', '#795548', '#ffc107', '#3f51b5', '#009688', '#cddc39', '#f57c00', '#81d4fa', '#f50057', '#673ab7', '#455a64', '#7e57c2', '#00e676', '#90a4ae', '#ff8a80', '#0091ea', '#82b1ff', '#4db6ac', '#d1c4e9', '#00b0ff', '#b2dfdb', '#000000'];
-
-  // 配置项
-  var option = {
-    title: {
-      text: '各院系在校生参测率',
-      left: '36%', // 您可以根据需要调整百分比值
-      textStyle: {
-        color: "#FFFFFF"
-        // fontSize: 10,
-      },
-    },
-    xAxis: {
-      type: 'value', 
-      axisLabel: {
-        textStyle: {
-          color: '#FFFFFF' // 设置 x 轴标签的颜色为红色
-        }
-      },
-    },
-    grid:{
-      top:48,
-      left:155,// 调整这个属性
-      right:50,
-      bottom:50,
-    },
-    yAxis: {
-      type: 'category',
-      data: data.map(item => item.name),
-      axisLabel: {
-        textStyle: {
-          color: '#FFFFFF' // 设置 y 轴标签的颜色为蓝色
-        }
-      },
-    },
-    series: [{
-      name: '参测率',
-      type: 'bar',
-      data: data.map(item => item.value),
-      label: {
-        show: true,
-        position: 'insideRight',
-        color: '#FFFFFF' // 设置标签的字体颜色，这里是黑色
-      },
-      itemStyle: {
-        color: function (params) {
-          return colors[params.dataIndex];
-        }
-      }
-    }]
-  };
-
-  myChart.setOption(option);
-  window.addEventListener('resize', function () {
-    myChart.resize();
-  })
-})();
 
 

@@ -30,6 +30,8 @@
                         重置
                     </button>
                 </div>
+
+                
             </form>
         </div>
     </div>
@@ -56,25 +58,14 @@
 
 {% include 'system/common/footer.html' %}
 
-   
+
 </script>
 
 {# 用户修改操作 #}
 <script type="text/html" id="user-bar">
     {% if authorize("student:data") %}
-    <button class="layui-btn layui-btn-xs" lay-event="view" style="background-color: #2076d3; color: white; border-radius: 5px;">
-        <i class="pear-icon"></i> 成绩查看
+    <button class="layui-btn layui-btn-xs" lay-event="view" style="background-color: #2076d3; color: white; border-radius: 5px;"><i class="pear-icon">成绩查看</i> 
     </button>
-    </button>
-    {% endif %}
-    {% if authorize("student:data") %}
-        <button class="layui-btn layui-btn-xs" lay-event="edit"><i class="pear-icon pear-icon-edit"> 编辑</i>
-        </button>
-    {% endif %}
-    {% if authorize("student:data") %}
-        <button class="layui-btn layui-btn-danger layui-btn-xs" lay-event="remove"><i
-                class="pear-icon pear-icon-ashbin"> 删除</i>
-        </button>
     {% endif %}
 </script>
 
@@ -123,7 +114,7 @@
                 { title: '1000米跑', field: 'run1000', align: 'center', width: 100 },
                 { title: '一分钟仰卧起坐', field: 'oneMinuteSitUps', align: 'center', width: 100 },
                 { title: '引体向上', field: 'pullUP', align: 'center', width: 100 },
-                { title: '操作', toolbar: '#user-bar', align: 'center', width: 240 }
+                { title: '操作', toolbar: '#user-bar', align: 'center', width: 100 }
 
             ]
         ]
@@ -137,8 +128,9 @@
             page: true,
             cols: cols,
             skin: 'line',
+            toolbar: '#user-toolbar', /*工具栏*/
             text: { none: '暂无人员信息' },
-            defaultToolbar: [{ layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'filter', 'print', 'exports'] /*默认工具栏*/
+            defaultToolbar: ['filter', 'exports'] /*默认工具栏*/
         })
 
 
@@ -169,17 +161,13 @@
             window.refresh(field)
         })
 
+
         table.on('tool(user-table)', function (obj) {
             if (obj.event === 'remove') {
                 window.remove(obj)
-            } else if (obj.event === 'edit') {
-                window.edit(obj)
             }
-        })
-        table.on('tool(user-table)', function (obj) {
-            if (obj.event === 'view') {
-                window.queryPhysicalData(obj.data); // 传入 obj.data
-                console.log(obj.data);
+            else if (obj.event === 'view') {
+                window.queryPhysicalData(obj.data); 
             }
         });
 
@@ -241,22 +229,13 @@
                 content: MODULE_PATH + 'add'
             })
         }
-        window.edit = function (obj) {
-            layer.open({
-                type: 2,
-                title: '修改',
-                shade: 0.1,
-                area: ['550px', '500px'],
-                content: MODULE_PATH + 'edit/' + obj.data['id']
-            })
-        }
 
         window.queryPhysicalData = function (userData) {
             layer.open({
                 type: 1, // 使用1表示页面内容
                 title: '查询当前用户成绩',
                 shade: 0.1,
-                area: ['700px', '650px'],
+                area: ['700px', '550px'],
                 content:
                     '<div style="margin-left: 20px;"><strong>姓名：</strong>' + userData.sName + '</div>' +
                     '<div style="margin-left: 20px;"><strong>学号：</strong>' + userData.sNumber + '</div>' +
@@ -286,6 +265,7 @@
         }
 
         window.remove = function (obj) {
+            console.log('good')
             layer.confirm('确定要删除该用户', { icon: 3, title: '提示' }, function (index) {
                 layer.close(index)
                 let loading = layer.load()

@@ -127,19 +127,12 @@ def dataSave():
         return fail_api(msg="学生姓名或学号不能为空")
 
 
-
     filters = []
     filters.append(Student.sName.contains(sName))
     filters.append(Student.sNumber.contains(sNumber))
 
     student = Student.query.filter(*filters).first()
-    print('AAAAA')
-    print('AAAAA')
-    print('AAAAA')
-    print(student)
-    print('AAAAA')
-    print('AAAAA')
-    print('AAAAA')
+
     if not student:
         return fail_api(msg="学生不存在")
 
@@ -164,15 +157,30 @@ def dataSave():
         update_data['oneMinuteSitUps'] = oneMinuteSitUps
     if pullUP:
         update_data['pullUP'] = pullUP
-       
-    result = Student.query.filter_by(sName=sName, sNumber=sNumber).update(update_data)
-    if result == 0:
-        print(f"调试信息: 更新失败，未找到匹配的学生记录，sName: {sName}, sNumber: {sNumber}")
-    else:
-        print(f"调试信息: 更新成功，更新了 {result} 条记录")
+
+    Student.query.filter_by(sName=sName, sNumber=sNumber).update(update_data)
+
+    # result = Student.query.filter_by(sName=sName, sNumber=sNumber).update(update_data)
+    # if result == 0:
+    #     print(f"调试信息: 更新失败，未找到匹配的学生记录，sName: {sName}, sNumber: {sNumber}")
+    # else:
+    #     print(f"调试信息: 更新成功，更新了 {result} 条记录")
+
 
     db.session.commit()
     return success_api(msg="添加成功")
+
+
+
+
+#  编辑用户
+@bp.get('/data/edit/<int:id>')
+@authorize("student:data")
+def dataEdit(id):
+    student = curd.get_one_by_id(Student, id)
+    colleges = College.query.all()
+    return render_template('student/edit.html', student=student, colleges=colleges)
+
 
 
 
@@ -201,7 +209,8 @@ def add():
 @bp.get('/info/')
 @authorize("student:info")
 def info():
-    return render_template('student/main.html')
+    colleges = College.query.all()
+    return render_template('student/main.html',colleges=colleges)
 
 
 
@@ -227,12 +236,24 @@ def infoData():
     # 获取请求参数 姓名 学号
     real_name = str_escape(request.args.get('realname', type=str))
     username = str_escape(request.args.get('username', type=str))
+    classNum = str_escape(request.args.get('classNum', type=str))
+    grade = str_escape(request.args.get('grade', type=str))
+    collegeCode = str_escape(request.args.get('collegeCode', type=str))
+
 
     filters = []
     if real_name:
         filters.append(Student.sName.contains(real_name))
     if username:
         filters.append(Student.sNumber.contains(username))
+    if classNum:
+        filters.append(Student.classNum.contains(classNum))
+    if grade:
+        filters.append(Student.grade.contains(grade))
+    if collegeCode:
+        filters.append(Student.collegeCode.contains(collegeCode))
+
+
 
     # print(*filters)
     query = db.session.query(
@@ -351,6 +372,39 @@ def infoSave():
 @authorize("student:show")
 def show():
     return render_template('student/show/index.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -4,7 +4,7 @@
 <head>
     <title>用户管理</title>
     {% include 'system/common/header.html' %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='system/admin/css/other/user.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='system/admin/css/other/user2.css') }}" />
 </head>
 
 <body class="pear-container">
@@ -21,16 +21,59 @@
                     <div class="layui-input-inline">
                         <input type="text" name="username" placeholder="" class="layui-input">
                     </div>
+
+
+                    <label class="layui-form-label">学院</label>
+
+                    <div class="layui-input-inline">
+                        <select name="collegeCode">
+                            <option value="" disabled selected>请选择</option> <!-- 默认空选项 -->
+                            {% for college in colleges %}
+                            <option value="{{ college.collegeCode }}" title="{{ college.className }}">
+                                {{ college.className }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    
+
+
+
+
+                </div>
+
+                <div class="layui-form-item" style="margin-bottom: unset;">
+
+                    <label class="layui-form-label">年级</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="grade" placeholder="" class="layui-input">
+                    </div>
+
+                    <label class="layui-form-label">班级</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="classNum" placeholder="" class="layui-input">
+                    </div>
+
+
+                    <label class="layui-form-label"></label>
+
                     <button class="layui-btn layui-btn-md" lay-submit lay-filter="user-query">
                         <i class="layui-icon layui-icon-search"></i>
                         查询
                     </button>
+
                     <button type="reset" class="layui-btn layui-btn-primary layui-btn-md">
                         <i class="layui-icon layui-icon-refresh"></i>
                         重置
                     </button>
+
                 </div>
+
+
+
             </form>
+
         </div>
     </div>
     <div class="user-left user-collasped">
@@ -74,11 +117,6 @@
         <button class="layui-btn layui-btn-xs" lay-event="edit"><i class="pear-icon pear-icon-edit"> 编辑</i>
         </button>
     {% endif %}
-    {% if authorize("student:info") %}
-        <button class="layui-btn layui-btn-danger layui-btn-xs" lay-event="remove"><i
-                class="pear-icon pear-icon-ashbin"> 删除</i>
-        </button>
-    {% endif %}
 </script>
 
 {% raw %}
@@ -118,15 +156,15 @@
         let cols = [
             [
                 { title: '编号', field: 'id', align: 'center' },
-                { title: '姓名', field: 'sName', align: 'center', width: 110 },
-                { title: '性别', field: 'sSex', align: 'center', width: 180 },
-                { title: '学号', field: 'sNumber', align: 'center' },
-                { title: '学院', field: 'collegeCode', align: 'center', templet: collegeCode, width: 120 },
+                { title: '姓名', field: 'sName', align: 'center' },
+                { title: '性别', field: 'sSex', align: 'center' ,width: 20 },
+                { title: '学号', field: 'sNumber', align: 'center',width: 180 },
+                { title: '学院', field: 'collegeCode', align: 'center', templet: collegeCode, width: 180 },
                 { title: '启用', field: 'enable', align: 'center', templet: '#user-enable', width: 120 },
                 { title: '年级', field: 'grade', align: 'center' },
                 { title: '班级', field: 'classNum', align: 'center' },
                 { title: '出生日期', field: 'sBirthDate', templet: '#user-Time', align: 'center', width: 180 },
-                { title: '操作', toolbar: '#user-bar', align: 'center', width: 180 }
+                { title: '操作', toolbar: '#user-bar', align: 'center', width: 100 }
 
             ]
         ]
@@ -156,7 +194,7 @@
             skin: 'line',
             toolbar: '#user-toolbar', /*工具栏*/
             text: { none: '暂无人员信息' },
-            defaultToolbar: [{ layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'filter', 'print', 'exports'] /*默认工具栏*/
+            defaultToolbar: [ 'filter', 'exports'] /*默认工具栏*/
         })
 
 
@@ -188,9 +226,7 @@
         })
 
         table.on('tool(user-table)', function (obj) {
-            if (obj.event === 'remove') {
-                window.remove(obj)
-            } else if (obj.event === 'edit') {
+            if (obj.event === 'edit') {
                 window.edit(obj)
             }
         })
@@ -198,14 +234,6 @@
         table.on('toolbar(user-table)', function (obj) {
             if (obj.event === 'add') {
                 window.add()
-            } else if (obj.event === 'refresh') {
-                window.refresh()
-            } else if (obj.event === 'batchRemove') {
-                window.batchRemove(obj)
-            } else if (obj.event === 'collasped') {
-                $('.user-left').toggleClass('user-collasped')
-                $('.user-main').toggleClass('user-collasped')
-                table.resize()
             }
         })
 
@@ -259,29 +287,6 @@
                 content: MODULE_PATH + 'edit/' + obj.data['id']
             })
         }
-
-        window.remove = function (obj) {
-            layer.confirm('确定要删除该用户', { icon: 3, title: '提示' }, function (index) {
-                layer.close(index)
-                let loading = layer.load()
-                $.ajax({
-                    url: MODULE_PATH + 'remove/' + obj.data['id'],
-                    dataType: 'json',
-                    type: 'delete',
-                    success: function (result) {
-                        layer.close(loading)
-                        if (result.success) {
-                            popup.success(result.msg, function () {
-                                obj.del()
-                            })
-                        } else {
-                            popup.failure(result.msg)
-                        }
-                    }
-                })
-            })
-        }
-
 
         window.refresh = function (param) {
             table.reload('user-table', { where: param })
