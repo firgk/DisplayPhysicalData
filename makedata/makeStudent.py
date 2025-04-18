@@ -3,6 +3,13 @@ import string
 from datetime import datetime
 from faker import Faker
 from calScore import calculate_score
+from calError import calculate_error
+from calKind import student_cluster_analysis
+from calPrediction import predict_student_performance
+
+
+
+
 # from applications.models import Student
 # TODO 引入不正确
 # TODO pear.application.common 引入不正确
@@ -187,8 +194,13 @@ datas = generate_data(num)
 
 score_data=[]
 for student in datas:
-    score = calculate_score(student)
-    score_data.append(score)
+    student = calculate_score(student)
+    student = calculate_error(student,datas)  # 传入所有学生数据
+    score_data.append(student)
+
+student_cluster_analysis(datas)
+predict_student_performance(datas)
+
 
 
 # 格式化输出数据
@@ -225,8 +237,8 @@ for data in score_data:
         score_pullUP='{data.score_pullUP}',
         score_allScore='{data.score_allScore}',
         
-        score_error='0',
-        score_errormessage='',
+        score_error='{data.score_error}',
+        score_errormessage='{data.score_errormessage}',
         password_hash='pbkdf2:sha256:150000$raM7mDSr$58fe069c3eac01531fc8af85e6fc200655dd2588090530084d182e6ec9d52c85',
         enable='1'
     ),"""

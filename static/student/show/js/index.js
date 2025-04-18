@@ -205,23 +205,21 @@
 
 
 // 柱状图2
-//不同群体体测平均成绩
 // 12
 
 (function () {
   // 1.实例化对象
   var myChart = echarts.init(document.querySelector(".bar2 .chart"));
+  
   // 2.指定配置项和数据
   var option = {
     color: ['#2f89cf'],
-    // 提示框组件
     tooltip: {
       trigger: 'axis',
-      axisPointer: { // 坐标轴指示器，坐标轴触发有效
-        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+      axisPointer: {
+        type: 'shadow'
       }
     },
-    // 修改图表位置大小
     grid: {
       left: '0%',
       top: '10px',
@@ -229,66 +227,81 @@
       bottom: '4%',
       containLabel: true
     },
-    // x轴相关配置
     xAxis: [{
       type: 'category',
-      data: ["旅游行业", "教育培训", "游戏行业", "医疗行业", "电商行业", "社交行业", "金融行业"],
+      data: [],
       axisTick: {
         alignWithLabel: true
       },
-      // 修改刻度标签，相关样式
       axisLabel: {
         color: "rgba(255,255,255,0.8)",
         fontSize: 10
       },
-      // x轴样式不显示
       axisLine: {
         show: false
       }
     }],
-    // y轴相关配置
     yAxis: [{
       type: 'value',
-      // 修改刻度标签，相关样式
       axisLabel: {
         color: "rgba(255,255,255,0.6)",
         fontSize: 12
       },
-      // y轴样式修改
       axisLine: {
         lineStyle: {
           color: "rgba(255,255,255,0.6)",
           width: 2
         }
       },
-      // y轴分割线的颜色
       splitLine: {
         lineStyle: {
           color: "rgba(255,255,255,0.1)"
         }
       }
     }],
-    // 系列列表配置
     series: [{
-      name: '直接访问',
+      name: '学生数量',
       type: 'bar',
       barWidth: '35%',
-      // ajax传动态数据
-      data: [200, 300, 300, 900, 1500, 1200, 600],
+      data: [],
       itemStyle: {
-        // 修改柱子圆角
         barBorderRadius: 5
       }
     }]
   };
-  // 3.把配置项给实例对象
-  myChart.setOption(option);
+
+  // 3.获取数据并更新图表
+  $.ajax({
+    url: '/api/cluster_analysis_result',
+    type: 'GET',
+    success: function(res) {
+      if (res.success) {
+        var clusterStats = res.data.clusterStats;
+        // 只显示群体名称的第一部分（如"标准型"），保持简洁
+        option.xAxis[0].data = clusterStats.map(item => item.name.split('-')[0]);
+        option.series[0].data = clusterStats.map(item => item.value);
+        myChart.setOption(option);
+      } else {
+        console.error('获取聚类分析数据失败:', res.msg);
+      }
+    },
+    error: function(err) {
+      console.error('请求聚类分析数据失败:', err);
+    }
+  });
 
   // 4.让图表随屏幕自适应
   window.addEventListener('resize', function () {
     myChart.resize();
   })
 })();
+
+
+
+
+
+
+
 
 
 
@@ -572,7 +585,7 @@
 
 
 // 饼形图1
-//体测数据异常值占比
+//实测成绩分布
 // 31
 (function () {
   // 定义一个异步函数来获取数据
@@ -639,78 +652,52 @@
 
 // 饼形图2
 // 体测数据异常值占比
-// 33
 (function () {
   var myChart = echarts.init(document.querySelector('.pie2 .chart'));
-  var option = {
-    color: ['#60cda0', '#ed8884', '#ff9f7f', '#0096ff', '#9fe6b8', '#32c5e9', '#1d9dff'],
-    tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b} : {c} ({d}%)'
-    },
-    legend: {
-      bottom: 0,
-      itemWidth: 10,
-      itemHeight: 10,
-      textStyle: {
-        color: "rgba(255,255,255,.5)",
-        fontSize: 10
-      }
-    },
-    series: [{
-      name: '地区分布',
-      type: 'pie',
-      radius: ["10%", "60%"],
-      center: ['50%', '40%'],
-      // 半径模式  area面积模式
-      roseType: 'radius',
-      // 图形的文字标签
-      label: {
-        fontsize: 10
-      },
-      // 引导线调整
-      labelLine: {
-        // 连接扇形图线长(斜线)
-        length: 6,
-        // 连接文字线长(横线)
-        length2: 8
-      },
-      data: [{
-        value: 26,
-        name: '北京'
-      },
-      {
-        value: 24,
-        name: '山东'
-      },
-      {
-        value: 25,
-        name: '河北'
-      },
-      {
-        value: 20,
-        name: '江苏'
-      },
-      {
-        value: 25,
-        name: '浙江'
-      },
-      {
-        value: 30,
-        name: '四川'
-      },
-      {
-        value: 42,
-        name: '湖北'
-      }
-      ]
-    }]
-  };
+  
+  // 获取异常统计数据
+  fetch('/api/error_statistics')
+    .then(response => response.json())
+    .then(data => {
+      var option = {
+        color: ['#60cda0', '#ed8884', '#ff9f7f', '#0096ff', '#9fe6b8', '#32c5e9', '#1d9dff'],
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        legend: {
+          bottom: 0,
+          itemWidth: 10,
+          itemHeight: 10,
+          textStyle: {
+            color: "rgba(255,255,255,.5)",
+            fontSize: 10
+          }
+        },
+        series: [{
+          name: '异常类型分布',
+          type: 'pie',
+          radius: ["10%", "60%"],
+          center: ['50%', '40%'],
+          roseType: 'radius',
+          label: {
+            fontSize: 10
+          },
+          labelLine: {
+            length: 6,
+            length2: 8
+          },
+          data: data.data
+        }]
+      };
 
-  myChart.setOption(option);
+      myChart.setOption(option);
+    })
+    .catch(error => console.error('Error fetching error statistics:', error));
+
   window.addEventListener('resize', function () {
     myChart.resize();
-  })
+  });
 })();
 
 
