@@ -1,8 +1,10 @@
 
 
 def calculate_score(student):
+
+
     # 计算BMI
-    bmi = float(student.sWeight) / ((float(student.sHeight) / 100) ** 2)
+    bmi = round(float(student.sWeight) / ((float(student.sHeight) / 100) ** 2), 2)
     # 各项成绩占比
     bmi_weight = 0.15
     sVitalCapacity_weight = 0.15
@@ -26,28 +28,15 @@ def calculate_score(student):
     pullUP_score = getpullUP_score(student)
 
 
-
-    # 计算总成绩
-    # if student.sSex == '女':
-    #     all_score = (
-    #             bmi_score * bmi_weight +
-    #             float(sVitalCapacity_score) * sVitalCapacity_weight +
-    #             float(run50_score) * run50_weight +
-    #             float(standingLongJump_score) * standingLongJump_weight +
-    #             float(sittingForward_score) * sittingForward_weight +
-    #             float(run800_score) * run800_weight +
-    #             float(oneMinuteSitUps_score) * oneMinuteSitUps_weight
-    #     )
-    # 计算总成绩
     if student.sSex == '女':
         all_score = (
-                (bmi_score if bmi_score is not None else 0) * bmi_weight +
-                (float(sVitalCapacity_score) if sVitalCapacity_score is not None else 0) * sVitalCapacity_weight +
-                (float(run50_score) if run50_score is not None else 0) * run50_weight +
-                (float(standingLongJump_score) if standingLongJump_score is not None else 0) * standingLongJump_weight +
-                (float(sittingForward_score) if sittingForward_score is not None else 0) * sittingForward_weight +
-                (float(run800_score) if run800_score is not None else 0) * run800_weight +
-                (float(oneMinuteSitUps_score) if oneMinuteSitUps_score is not None else 0) * oneMinuteSitUps_weight
+                bmi_score * bmi_weight +
+                float(sVitalCapacity_score) * sVitalCapacity_weight +
+                float(run50_score) * run50_weight +
+                float(standingLongJump_score) * standingLongJump_weight +
+                float(sittingForward_score) * sittingForward_weight +
+                float(run800_score) * run800_weight +
+                float(oneMinuteSitUps_score) * oneMinuteSitUps_weight
         )
     elif student.sSex == '男':
         all_score = (
@@ -63,14 +52,14 @@ def calculate_score(student):
         print("ERROR: 性别不明")
 
     student.score_bmi=bmi
-    student.score_sVitalCapacity=student.sVitalCapacity
-    student.score_run50=student.run50
-    student.score_standingLongJump=student.standingLongJump
-    student.score_sittingForward=student.sittingForward
-    student.score_run800=student.run800
-    student.score_run1000=student.run1000
-    student.score_oneMinuteSitUps=student.oneMinuteSitUps
-    student.score_pullUP=student.pullUP
+    student.score_sVitalCapacity=sVitalCapacity_score
+    student.score_run50=run50_score
+    student.score_standingLongJump=standingLongJump_score
+    student.score_sittingForward=sittingForward_score
+    student.score_run800=run800_score
+    student.score_run1000=run1000_score
+    student.score_oneMinuteSitUps=oneMinuteSitUps_score
+    student.score_pullUP=pullUP_score
     student.score_allScore=all_score
 
     return student
@@ -275,171 +264,171 @@ def getsVitalCapacity_score(student):
                 return 10
 
 
-        elif student.sSex=='女':
-            if grade == '1':
-                if vital_capacity >= 3400:
-                    return 100
-                elif vital_capacity >= 3350:
-                    return 95
-                elif vital_capacity >= 3300:
-                    return 90
-                elif vital_capacity >= 3150:
-                    return 85
-                elif vital_capacity >= 3000:
-                    return 80
-                elif vital_capacity >= 2900:
-                    return 78
-                elif vital_capacity >= 2800:
-                    return 76
-                elif vital_capacity >= 2700:
-                    return 74
-                elif vital_capacity >= 2600:
-                    return 72
-                elif vital_capacity >= 2500:
-                    return 70
-                elif vital_capacity >= 2400:
-                    return 68
-                elif vital_capacity >= 2300:
-                    return 66
-                elif vital_capacity >= 2200:
-                    return 64
-                elif vital_capacity >= 2100:
-                    return 62
-                elif vital_capacity >= 2000:
-                    return 60
-                elif vital_capacity >= 1960:
-                    return 50
-                elif vital_capacity >= 1920:
-                    return 40
-                elif vital_capacity >= 1880:
-                    return 30
-                elif vital_capacity >= 1840:
-                    return 20
-                else:
-                    return 10
-            elif grade == '2':
-                if vital_capacity >= 3450:
-                    return 100
-                elif vital_capacity >= 3400:
-                    return 95
-                elif vital_capacity >= 3350:
-                    return 90
-                elif vital_capacity >= 3200:
-                    return 85
-                elif vital_capacity >= 3050:
-                    return 80
-                elif vital_capacity >= 2950:
-                    return 78
-                elif vital_capacity >= 2850:
-                    return 76
-                elif vital_capacity >= 2750:
-                    return 74
-                elif vital_capacity >= 2650:
-                    return 72
-                elif vital_capacity >= 2550:
-                    return 70
-                elif vital_capacity >= 2450:
-                    return 68
-                elif vital_capacity >= 2350:
-                    return 66
-                elif vital_capacity >= 2250:
-                    return 64
-                elif vital_capacity >= 2150:
-                    return 62
-                elif vital_capacity >= 2050:
-                    return 60
-                elif vital_capacity >= 2010:
-                    return 50
-                elif vital_capacity >= 1970:
-                    return 40
-                elif vital_capacity >= 1930:
-                    return 30
-                elif vital_capacity >= 1890:
-                    return 20
-                else:
-                    return 10
-            elif grade == '3':
-                if vital_capacity >= 3450:
-                    return 100
-                elif vital_capacity >= 3400:
-                    return 95
-                elif vital_capacity >= 3350:
-                    return 90
-                elif vital_capacity >= 3200:
-                    return 85
-                elif vital_capacity >= 3050:
-                    return 80
-                elif vital_capacity >= 2950:
-                    return 78
-                elif vital_capacity >= 2850:
-                    return 76
-                elif vital_capacity >= 2750:
-                    return 74
-                elif vital_capacity >= 2650:
-                    return 72
-                elif vital_capacity >= 2550:
-                    return 70
-                elif vital_capacity >= 2450:
-                    return 68
-                elif vital_capacity >= 2350:
-                    return 66
-                elif vital_capacity >= 2250:
-                    return 64
-                elif vital_capacity >= 2150:
-                    return 62
-                elif vital_capacity >= 2050:
-                    return 60
-                elif vital_capacity >= 2010:
-                    return 50
-                elif vital_capacity >= 1970:
-                    return 40
-                elif vital_capacity >= 1930:
-                    return 30
-                elif vital_capacity >= 1890:
-                    return 20
-                else:
-                    return 10
-            elif grade == '4':
-                if vital_capacity >= 3450:
-                    return 100
-                elif vital_capacity >= 3400:
-                    return 95
-                elif vital_capacity >= 3350:
-                    return 90
-                elif vital_capacity >= 3200:
-                    return 85
-                elif vital_capacity >= 3050:
-                    return 80
-                elif vital_capacity >= 2950:
-                    return 78
-                elif vital_capacity >= 2850:
-                    return 76
-                elif vital_capacity >= 2750:
-                    return 74
-                elif vital_capacity >= 2650:
-                    return 72
-                elif vital_capacity >= 2550:
-                    return 70
-                elif vital_capacity >= 2450:
-                    return 68
-                elif vital_capacity >= 2350:
-                    return 66
-                elif vital_capacity >= 2250:
-                    return 64
-                elif vital_capacity >= 2150:
-                    return 62
-                elif vital_capacity >= 2050:
-                    return 60
-                elif vital_capacity >= 2010:
-                    return 50
-                elif vital_capacity >= 1970:
-                    return 40
-                elif vital_capacity >= 1930:
-                    return 30
-                elif vital_capacity >= 1890:
-                    return 20
-                else:
-                    return 10
+    elif student.sSex=='女':
+        if grade == '1':
+            if vital_capacity >= 3400:
+                return 100
+            elif vital_capacity >= 3350:
+                return 95
+            elif vital_capacity >= 3300:
+                return 90
+            elif vital_capacity >= 3150:
+                return 85
+            elif vital_capacity >= 3000:
+                return 80
+            elif vital_capacity >= 2900:
+                return 78
+            elif vital_capacity >= 2800:
+                return 76
+            elif vital_capacity >= 2700:
+                return 74
+            elif vital_capacity >= 2600:
+                return 72
+            elif vital_capacity >= 2500:
+                return 70
+            elif vital_capacity >= 2400:
+                return 68
+            elif vital_capacity >= 2300:
+                return 66
+            elif vital_capacity >= 2200:
+                return 64
+            elif vital_capacity >= 2100:
+                return 62
+            elif vital_capacity >= 2000:
+                return 60
+            elif vital_capacity >= 1960:
+                return 50
+            elif vital_capacity >= 1920:
+                return 40
+            elif vital_capacity >= 1880:
+                return 30
+            elif vital_capacity >= 1840:
+                return 20
+            else:
+                return 10
+        elif grade == '2':
+            if vital_capacity >= 3450:
+                return 100
+            elif vital_capacity >= 3400:
+                return 95
+            elif vital_capacity >= 3350:
+                return 90
+            elif vital_capacity >= 3200:
+                return 85
+            elif vital_capacity >= 3050:
+                return 80
+            elif vital_capacity >= 2950:
+                return 78
+            elif vital_capacity >= 2850:
+                return 76
+            elif vital_capacity >= 2750:
+                return 74
+            elif vital_capacity >= 2650:
+                return 72
+            elif vital_capacity >= 2550:
+                return 70
+            elif vital_capacity >= 2450:
+                return 68
+            elif vital_capacity >= 2350:
+                return 66
+            elif vital_capacity >= 2250:
+                return 64
+            elif vital_capacity >= 2150:
+                return 62
+            elif vital_capacity >= 2050:
+                return 60
+            elif vital_capacity >= 2010:
+                return 50
+            elif vital_capacity >= 1970:
+                return 40
+            elif vital_capacity >= 1930:
+                return 30
+            elif vital_capacity >= 1890:
+                return 20
+            else:
+                return 10
+        elif grade == '3':
+            if vital_capacity >= 3450:
+                return 100
+            elif vital_capacity >= 3400:
+                return 95
+            elif vital_capacity >= 3350:
+                return 90
+            elif vital_capacity >= 3200:
+                return 85
+            elif vital_capacity >= 3050:
+                return 80
+            elif vital_capacity >= 2950:
+                return 78
+            elif vital_capacity >= 2850:
+                return 76
+            elif vital_capacity >= 2750:
+                return 74
+            elif vital_capacity >= 2650:
+                return 72
+            elif vital_capacity >= 2550:
+                return 70
+            elif vital_capacity >= 2450:
+                return 68
+            elif vital_capacity >= 2350:
+                return 66
+            elif vital_capacity >= 2250:
+                return 64
+            elif vital_capacity >= 2150:
+                return 62
+            elif vital_capacity >= 2050:
+                return 60
+            elif vital_capacity >= 2010:
+                return 50
+            elif vital_capacity >= 1970:
+                return 40
+            elif vital_capacity >= 1930:
+                return 30
+            elif vital_capacity >= 1890:
+                return 20
+            else:
+                return 10
+        elif grade == '4':
+            if vital_capacity >= 3450:
+                return 100
+            elif vital_capacity >= 3400:
+                return 95
+            elif vital_capacity >= 3350:
+                return 90
+            elif vital_capacity >= 3200:
+                return 85
+            elif vital_capacity >= 3050:
+                return 80
+            elif vital_capacity >= 2950:
+                return 78
+            elif vital_capacity >= 2850:
+                return 76
+            elif vital_capacity >= 2750:
+                return 74
+            elif vital_capacity >= 2650:
+                return 72
+            elif vital_capacity >= 2550:
+                return 70
+            elif vital_capacity >= 2450:
+                return 68
+            elif vital_capacity >= 2350:
+                return 66
+            elif vital_capacity >= 2250:
+                return 64
+            elif vital_capacity >= 2150:
+                return 62
+            elif vital_capacity >= 2050:
+                return 60
+            elif vital_capacity >= 2010:
+                return 50
+            elif vital_capacity >= 1970:
+                return 40
+            elif vital_capacity >= 1930:
+                return 30
+            elif vital_capacity >= 1890:
+                return 20
+            else:
+                return 10
 
 
 

@@ -6,7 +6,7 @@ roledata = [
     Role(
         id=1,
         code='admin',
-        name='系统管理员',
+        name='校级领导层',
         enable=1,
         details='最高管理员，管理系统和数据',
         sort=1,
@@ -15,7 +15,7 @@ roledata = [
     Role(
         id=2,
         code='dean',
-        name='次级管理员',
+        name='教学管理部门',
         enable=1,
         details='管理部分系统和数据',
         sort=2,
@@ -24,7 +24,7 @@ roledata = [
     Role(
         id=3,
         code='input',
-        name='成绩录入人员',
+        name='负责成绩录入的教师',
         enable=1,
         details='只可以录入成绩，不可修改成绩',
         sort=3,

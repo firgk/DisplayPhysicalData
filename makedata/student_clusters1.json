@@ -1,0 +1,8 @@
+{
+    "success": true,
+    "msg": "分析完成",
+    "total_students": 1000,
+    "cluster_count": 0,
+    "clusters": [],
+    "student_recommendations": []
+}

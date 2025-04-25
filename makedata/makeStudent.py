@@ -1,10 +1,13 @@
 import random
 import string
+import uuid
 from datetime import datetime
 from faker import Faker
 from calScore import calculate_score
 from calError import calculate_error
 from calKind import student_cluster_analysis
+from calKind import student_cluster_analysis2
+from calKind import student_cluster_analysis3
 from calPrediction import predict_student_performance
 
 
@@ -124,17 +127,20 @@ def generate_normal_data(mean, std_dev):
     if std_dev == 0:
         return mean
     while True:
-        value = round(random.gauss(mean, std_dev), 2)
+        # value = round(random.gauss(mean, std_dev), 2)
+        value = round(random.gauss(mean, mean*0.2), 2)
+        # 保留两位小数
         if value > 0:
             return value
 
 
 # 生成学生数据
-def generate_data(num):
+def generate_data(num,starter):
     datas = []
     for i in range(num):
         i=i+1
-        id=i
+        id=starter
+        starter=starter+1
         college_name = random.choice(list(colleges.keys()))
         college_code = colleges[college_name]
         grade = f'{random.randint(1, 4)}'
@@ -145,23 +151,23 @@ def generate_data(num):
         s_birth_date = fake.date_of_birth(minimum_age=18, maximum_age=25).strftime('%Y-%m-%d')
         # 根据性别设置身高体重肺活量等数据的均值和标准差
         if s_sex == '男':
-            s_height = generate_normal_data(176.1, 5)
-            s_weight = generate_normal_data(65.1, 5)
-            s_vital_capacity = int(generate_normal_data(2930, 150))
-            run50 = generate_normal_data(8.3, 0.5)
-            standing_long_jump = generate_normal_data(200, 0.3)
-            sitting_forward = generate_normal_data(13.6, 2)
-            run1000 = generate_normal_data(228, 0.3)
-            pull_up = int(generate_normal_data(7.1, 5))
+            s_height = generate_normal_data(176.1, 10)
+            s_weight = generate_normal_data(65.1, 10)
+            s_vital_capacity = int(generate_normal_data(4800, 150))
+            run50 = generate_normal_data(6.3, 10)
+            standing_long_jump = generate_normal_data(270, 10)
+            sitting_forward = generate_normal_data(16.6, 10)
+            run1000 = generate_normal_data(228, 10)
+            pull_up = int(generate_normal_data(14.1, 10))
         else:
-            s_height = generate_normal_data(165.9, 5)
-            s_weight = generate_normal_data(58.6, 5)
-            s_vital_capacity = int(generate_normal_data(2930, 150))
-            run50 = generate_normal_data(8.5, 0.5)
-            standing_long_jump = generate_normal_data(180, 0.1)
-            sitting_forward = generate_normal_data(14.7, 2)
-            run800 = generate_normal_data(204, 0.3)
-            one_minute_sit_ups = int(generate_normal_data(37.6, 5))
+            s_height = generate_normal_data(165.9, 10)
+            s_weight = generate_normal_data(58.6, 10)
+            s_vital_capacity = int(generate_normal_data(3500, 10))
+            run50 = generate_normal_data(7.1, 10)
+            standing_long_jump = generate_normal_data(220, 10)
+            sitting_forward = generate_normal_data(14.7, 10)
+            run800 = generate_normal_data(204, 10)
+            one_minute_sit_ups = int(generate_normal_data(72.6, 10))
 
         student = Student(
             id=id,
@@ -187,10 +193,10 @@ def generate_data(num):
     return datas
 
 
+
 # 生成1000条数据
 num = 1000
-datas = generate_data(num)
-
+datas = generate_data(num,0)
 
 score_data=[]
 for student in datas:
@@ -199,7 +205,31 @@ for student in datas:
     score_data.append(student)
 
 student_cluster_analysis(datas)
-predict_student_performance(datas)
+student_cluster_analysis2(datas)
+student_cluster_analysis3(datas)
+
+
+# predict_student_performance(datas)
+
+
+
+
+# 生成30000条数据
+
+# score_data = []
+# batch_size = 1000
+# num_batches = 30
+# starter = 0
+# for i in range(num_batches):
+#     datas = generate_data(batch_size,starter)
+#     starter+=1000
+#     for student in datas:
+#         student = calculate_score(student)
+#         student = calculate_error(student, datas)  # 传入所有学生数据
+#         score_data.append(student)
+
+
+
 
 
 

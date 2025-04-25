@@ -191,7 +191,7 @@ def dataEdit(id):
 @bp.get('/show_small/')
 @authorize("student:show_small")
 def show_small():
-    return render_template('student/show/index_small.html')
+    return render_template('student/analysis.html')
 
 
 

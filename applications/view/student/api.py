@@ -29,26 +29,26 @@ def distribution_of_actual_test_scores():
 
     # 模拟对成绩进行分组统计，这里以 allScore 为例
     score_ranges = {
-        "0 分以上": 0,
-        "20 - 29 分": 0,
-        "30 - 39 分": 0,
-        "40 - 49 分": 0,
-        "50 分以上": 0
+        "50 分以下": 0,
+        "50 - 60 分": 0,
+        "60 - 70 分": 0,
+        "70 - 80 分": 0,
+        "80 分以上": 0
     }
 
     for student in students:
         try:
             score = float(student.score_allScore)
-            if score < 20:
-                score_ranges["20 分以xia "] += 1
-            elif 20 <= score < 30:
-                score_ranges["20 - 29 分"] += 1
-            elif 30 <= score < 40:
-                score_ranges["30 - 39 分"] += 1
-            elif 40 <= score < 50:
-                score_ranges["40 - 49 分"] += 1
-            else:
-                score_ranges["50 分以上"] += 1
+            if score < 50:
+                score_ranges["50 分以下"] += 1
+            elif 50 <= score < 60:
+                score_ranges["50 - 60 分"] += 1
+            elif 60 <= score < 70:
+                score_ranges["60 - 70 分"] += 1
+            elif 70 <= score < 80:
+                score_ranges["70 - 80 分"] += 1
+            elif score >= 80:
+                score_ranges["80 分以上"] += 1
         except (ValueError, TypeError):
             continue
 
@@ -125,6 +125,8 @@ def average_bmi_data():
     })
 
 
+
+
 @bp.get('/grade_score_distribution')
 @login_required
 def grade_score_distribution():
@@ -150,13 +152,13 @@ def grade_score_distribution():
             score = float(student.score_allScore) if student.score_allScore else 0
             
             # 根据成绩划分等级
-            if score >= 90:
+            if score >= 80:
                 grade_data[grade]['优秀'] += 1
-            elif score >= 80:
+            elif score >= 70:
                 grade_data[grade]['良好'] += 1
             elif score >= 60:
                 grade_data[grade]['及格'] += 1
-            else:
+            elif score < 60:
                 grade_data[grade]['不及格'] += 1
         except (ValueError, TypeError):
             continue

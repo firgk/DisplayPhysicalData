@@ -2,8 +2,6 @@ rm -rf migrations/
 rm -f ../pear.db
 
 echo !!!!!! 需要构建数据
-python makedata/makeCollege.py
-python makedata/makeStudent.py
 echo !!!!!!需要构建数据
 
 flask db init
