@@ -20,6 +20,9 @@
 
 Pear Admin Flask
 
+## 演示视频
+
+https://www.bilibili.com/video/BV1rDLdzSEqS/
 
 ### 使用项目
 
