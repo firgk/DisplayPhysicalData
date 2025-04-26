@@ -31,7 +31,7 @@ cd test_venv
 克隆项目
 git clone https://github.com/firgk/display_physical_data.git
 切换目录
-cd DisplayPhysicalData
+cd display_physical_data
 安装依赖
 pip install -r requirements.txt
 
