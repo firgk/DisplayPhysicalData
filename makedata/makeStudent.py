@@ -9,6 +9,7 @@ from calKind import student_cluster_analysis
 from calKind import student_cluster_analysis2
 from calKind import student_cluster_analysis3
 from calPrediction import predict_student_performance
+import pickle
 
 
 
@@ -60,7 +61,7 @@ from calPrediction import predict_student_performance
 
 
 class Student():
-    def __init__(self, id,collegeCode, grade,classNum, sNumber, sName, sSex, sBirthDate, sHeight, sWeight, sVitalCapacity,run50, standingLongJump, sittingForward, run800, run1000, oneMinuteSitUps, pullUP
+    def __init__(self, id,collegeCode, grade,classNum, sNumber, sName, sSex, sBirthDate, sHeight, sWeight, sVitalCapacity,run50, standingLongJump, sittingForward, run800, run1000, oneMinuteSitUps, update_at,pullUP
 
 
                  ):
@@ -78,6 +79,7 @@ class Student():
         self.run50 = run50
         self.standingLongJump = standingLongJump
         self.sittingForward = sittingForward
+        self.update_at = update_at
         self.run800 = run800
         self.run1000 = run1000
         self.oneMinuteSitUps = oneMinuteSitUps
@@ -128,8 +130,7 @@ def generate_normal_data(mean, std_dev):
         return mean
     while True:
         # value = round(random.gauss(mean, std_dev), 2)
-        value = round(random.gauss(mean, mean*0.2), 2)
-        # 保留两位小数
+        value = round(random.gauss(mean, mean*0.2), 2) # 保留两位小数
         if value > 0:
             return value
 
@@ -149,6 +150,7 @@ def generate_data(num,starter):
         s_name = fake.name()
         s_sex = '男' if random.random() < 0.6 else '女'
         s_birth_date = fake.date_of_birth(minimum_age=18, maximum_age=25).strftime('%Y-%m-%d')
+        update_at=fake.date_between(start_date=datetime(2025, 1, 1), end_date=datetime.now()).strftime('%Y-%m-%d')
         # 根据性别设置身高体重肺活量等数据的均值和标准差
         if s_sex == '男':
             s_height = generate_normal_data(176.1, 10)
@@ -157,7 +159,7 @@ def generate_data(num,starter):
             run50 = generate_normal_data(6.3, 10)
             standing_long_jump = generate_normal_data(270, 10)
             sitting_forward = generate_normal_data(16.6, 10)
-            run1000 = generate_normal_data(228, 10)
+            run1000 = generate_normal_data(240, 3)  # 平均值240秒，对应72分左右
             pull_up = int(generate_normal_data(14.1, 10))
         else:
             s_height = generate_normal_data(165.9, 10)
@@ -166,7 +168,7 @@ def generate_data(num,starter):
             run50 = generate_normal_data(7.1, 10)
             standing_long_jump = generate_normal_data(220, 10)
             sitting_forward = generate_normal_data(14.7, 10)
-            run800 = generate_normal_data(204, 10)
+            run800 = generate_normal_data(230, 3)  # 平均值230秒，对应78分左右
             one_minute_sit_ups = int(generate_normal_data(72.6, 10))
 
         student = Student(
@@ -178,6 +180,7 @@ def generate_data(num,starter):
             sName=s_name,
             sSex=s_sex,
             sBirthDate=s_birth_date,
+            update_at=update_at,
             sHeight=str(s_height),
             sWeight=str(s_weight),
             sVitalCapacity=str(s_vital_capacity),
@@ -195,47 +198,75 @@ def generate_data(num,starter):
 
 
 # 生成1000条数据
-num = 1000
-datas = generate_data(num,0)
 
-score_data=[]
-for student in datas:
-    student = calculate_score(student)
-    student = calculate_error(student,datas)  # 传入所有学生数据
-    score_data.append(student)
-
-student_cluster_analysis(datas)
-student_cluster_analysis2(datas)
-student_cluster_analysis3(datas)
+# num = 20
+# datas = generate_data(num,0)
+#
+# students=[]
+# for student in datas:
+#     student = calculate_score(student)
+#     student = calculate_error(student,datas)  # 传入所有学生数据
+#     students.append(student)
 
 
-# predict_student_performance(datas)
+
+
 
 
 
 
 # 生成30000条数据
 
-# score_data = []
-# batch_size = 1000
-# num_batches = 30
-# starter = 0
-# for i in range(num_batches):
-#     datas = generate_data(batch_size,starter)
-#     starter+=1000
-#     for student in datas:
-#         student = calculate_score(student)
-#         student = calculate_error(student, datas)  # 传入所有学生数据
-#         score_data.append(student)
+students = []
+batch_size = 1000
+num_batches = 1
+starter = 0
+for i in range(num_batches):
+    datas = generate_data(batch_size,starter)
+    starter+=1000
+    for student in datas:
+        student = calculate_score(student)
+        student = calculate_error(student, datas)  # 传入所有学生数据
+        students.append(student)
+
+
+
+
+# 以二进制持久化 score_data 数据
+# with open('students30.bin', 'wb') as file:
+#     pickle.dump(students, file)
+
+
+# 读取 score_data 数据
+# with open('students30.bin', 'rb') as file:
+#     students = pickle.load(file)
+
+print("\n正在复制聚类分析文件...")
+import shutil
+# 拷贝文件student_clusters30.json 到 student_clusters.json
+# shutil.copy2('student_clusters30.json', 'student_clusters.json')
+# shutil.copy2('student_clusters301.json', 'student_clusters1.json')
+# shutil.copy2('student_clusters302.json', 'student_clusters2.json')
+print("文件复制完成")
+
+
+print("\n正在聚类分析...")
+student_cluster_analysis(students,'student_clusters.json')
+student_cluster_analysis2(students,'student_clusters1.json')
+student_cluster_analysis3(students,'student_clusters2.json')
+print("聚类分析完成")
 
 
 
 
 
-
+print("\n正在格式化输出数据...")
 # 格式化输出数据
 output = "datas = ["
-for data in score_data:
+total = len(students)
+for i, data in enumerate(students, 1):
+    if i % 100 == 0:
+        print(f"处理进度: {i}/{total} ({i/total*100:.1f}%)")
     output += f"""
     Student(
         id='{data.id}',
@@ -256,6 +287,7 @@ for data in score_data:
         run1000='{data.run1000}',
         oneMinuteSitUps='{data.oneMinuteSitUps}',
         pullUP='{data.pullUP}',
+        update_at='{data.update_at}',
         score_bmi='{data.score_bmi}',
         score_sVitalCapacity='{data.score_sVitalCapacity}',
         score_run50='{data.score_run50}',
@@ -282,5 +314,9 @@ with open('../applications/common/script/student.py', 'w', encoding='utf-8') as 
     file.write('now_time = datetime.datetime.now()\n')
     file.write('\n')
     file.write(output)
+
+
+
+
 
 

@@ -21,6 +21,42 @@
                     <div class="layui-input-inline">
                         <input type="text" name="username" placeholder="" class="layui-input">
                     </div>
+
+
+
+                    <label class="layui-form-label">学院</label>
+
+                    <div class="layui-input-inline">
+                        <select name="collegeCode">
+                            <option value="" disabled selected>请选择</option> <!-- 默认空选项 -->
+                            {% for college in colleges %}
+                            <option value="{{ college.collegeCode }}" title="{{ college.className }}">
+                                {{ college.className }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+
+                 
+                </div>
+
+                <div class="layui-form-item" style="margin-bottom: unset;">
+
+                    <label class="layui-form-label">年级</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="grade" placeholder="" class="layui-input">
+                    </div>
+
+                    <label class="layui-form-label">班级</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="classNum" placeholder="" class="layui-input">
+                    </div>
+
+
+                    <label class="layui-form-label"></label>
+
+                   
                     <button class="layui-btn layui-btn-md" lay-submit lay-filter="user-query">
                         <i class="layui-icon layui-icon-search"></i>
                         查询
@@ -29,6 +65,7 @@
                         <i class="layui-icon layui-icon-refresh"></i>
                         重置
                     </button>
+
                 </div>
 
                 
@@ -104,17 +141,27 @@
                 { title: '姓名', field: 'sName', align: 'center', width: 80 },
                 { title: '性别', field: 'sSex', align: 'center', width: 80 },
                 { title: '学号', field: 'sNumber', align: 'center', width: 130 },
+                { title: '总成绩', field: 'score_allScore', align: 'center', width: 100 },
                 { title: '身高', field: 'sHeight', align: 'center', width: 100 },
                 { title: '体重', field: 'sWeight', align: 'center', width: 100 },
+                { title: 'BMI', field: 'score_bmi', align: 'center', width: 100 },
                 { title: '肺活量', field: 'sVitalCapacity', align: 'center', width: 100 },
+                { title: '肺活量评分', field: 'score_sVitalCapacity', align: 'center', width: 100 },
                 { title: '50米跑', field: 'run50', align: 'center', width: 100 },
+                { title: '50米跑评分', field: 'score_run50', align: 'center', width: 120 },
                 { title: '立定跳远', field: 'standingLongJump', align: 'center', width: 100 },
+                { title: '立定跳远评分', field: 'score_standingLongJump', align: 'center', width: 120 },
                 { title: '坐位体前屈', field: 'sittingForward', align: 'center', width: 100 },
+                { title: '坐位体前屈评分', field: 'score_sittingForward', align: 'center', width: 140 },
                 { title: '800米跑', field: 'run800', align: 'center', width: 100 },
+                { title: '800米跑评分', field: 'score_run800', align: 'center', width: 120 }, 
                 { title: '1000米跑', field: 'run1000', align: 'center', width: 100 },
-                { title: '一分钟仰卧起坐', field: 'oneMinuteSitUps', align: 'center', width: 100 },
+                { title: '1000米跑评分', field: 'score_run1000', align: 'center', width: 120 },
+                { title: '仰卧起坐', field: 'oneMinuteSitUps', align: 'center', width: 100 },
+                { title: '仰卧起坐评分', field: 'score_oneMinuteSitUps', align: 'center', width: 120 },
                 { title: '引体向上', field: 'pullUP', align: 'center', width: 100 },
-                { title: '操作', toolbar: '#user-bar', align: 'center', width: 100 }
+                { title: '引体向上评分', field: 'score_pullUP', align: 'center', width: 120 },
+                // { title: '操作', toolbar: '#user-bar', align: 'center', width: 100 }
 
             ]
         ]
@@ -249,7 +296,7 @@
                     '<tbody>' +
                     '<tr><th>身高</th><td>' + userData.sHeight + '</td><td>' + '-' + '</td></tr>' +
                     '<tr><th>体重</th><td>' + userData.sWeight + '</td><td>' + '-' + '</td></tr>' +
-                    '<tr><th>体重指数（BMI）</th><td>' + '-' + '</td><td>' + userData.score_bmi + '</td></tr>' +
+                    '<tr><th>体重指数（BMI）</th><td>' + userData.score_bmi + '</td><td>' + '-' + '</td></tr>' +
                     '<tr><th>肺活量</th><td>' + userData.sVitalCapacity + '</td><td>' + userData.score_sVitalCapacity + '</td></tr>' +
                     '<tr><th>50米跑</th><td>' + userData.run50 + '</td><td>' + userData.score_run50 + '</td></tr>' +
                     '<tr><th>立定跳远</th><td>' + userData.standingLongJump + '</td><td>' + userData.score_standingLongJump + '</td></tr>' +

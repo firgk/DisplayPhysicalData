@@ -26,10 +26,8 @@ def calculate_score(student):
     run1000_score = getrun1000_score(student)
     oneMinuteSitUps_score = getoneMinuteSitUps_score(student)
     pullUP_score = getpullUP_score(student)
-
-
     if student.sSex == '女':
-        all_score = (
+        all_score = round(
                 bmi_score * bmi_weight +
                 float(sVitalCapacity_score) * sVitalCapacity_weight +
                 float(run50_score) * run50_weight +
@@ -37,9 +35,9 @@ def calculate_score(student):
                 float(sittingForward_score) * sittingForward_weight +
                 float(run800_score) * run800_weight +
                 float(oneMinuteSitUps_score) * oneMinuteSitUps_weight
-        )
+        , 2)
     elif student.sSex == '男':
-        all_score = (
+        all_score = round(
                 bmi_score * bmi_weight +
                 float(sVitalCapacity_score) * sVitalCapacity_weight +
                 float(run50_score) * run50_weight +
@@ -47,7 +45,7 @@ def calculate_score(student):
                 float(sittingForward_score) * sittingForward_weight +
                 float(run1000_score) * run1000_weight +
                 float(pullUP_score) * pullUP_weight
-        )
+        , 2)
     else:
         print("ERROR: 性别不明")
 
@@ -434,6 +432,8 @@ def getsVitalCapacity_score(student):
 
 
 def getrun50_score(student):
+    if student.run50 == 'None':
+        return
     run50 = float(student.run50)
     gender = student.sSex  # 假设student对象有gender属性来区分男女生
     grade = student.grade
@@ -769,6 +769,8 @@ def getrun50_score(student):
                 return 10
 
 def getstandingLongJump_score(student):
+    if student.standingLongJump=='None':
+        return
     jump = float(student.standingLongJump)
     grade = student.grade
     gender = student.sSex
@@ -1120,74 +1122,103 @@ def getsittingForward_score(student):
             else:
                 return 10
 
+
+
 def getrun800_score(student):
-    grade = student.grade
-    if student.sSex == '女' and (grade in ['1', '2']):
+    if student.sSex == '女': 
         run800 = float(student.run800)
-        # 将时间区间转换为秒
-        time_score_intervals = [
-            ((196, 198), 100),
-            ((202, 204), 95),
-            ((208, 210), 90),
-            ((215, 217), 85),
-            ((222, 224), 80),
-            ((227, 229), 78),
-            ((232, 234), 76),
-            ((237, 239), 74),
-            ((242, 244), 72),
-            ((247, 249), 70),
-            ((252, 254), 68),
-            ((257, 259), 66),
-            ((262, 264), 64),
-            ((267, 269), 62),
-            ((272, 274), 60),
-            ((282, 284), 50),
-            ((292, 294), 40),
-            ((302, 304), 30),
-            ((312, 314), 20),
-            ((322, 324), 10)
-        ]
-        for interval, score in time_score_intervals:
-            start_time, end_time = interval
-            if start_time <= run800 <= end_time:
-                return score
-        return 0
-    return 0
+        if run800 <= 198:
+            return 100
+        elif run800 <= 204:
+            return 95
+        elif run800 <= 210:
+            return 90
+        elif run800 <= 217:
+            return 85
+        elif run800 <= 224:
+            return 80
+        elif run800 <= 229:
+            return 78
+        elif run800 <= 234:
+            return 76
+        elif run800 <= 239:
+            return 74
+        elif run800 <= 244:
+            return 72
+        elif run800 <= 249:
+            return 70
+        elif run800 <= 254:
+            return 68
+        elif run800 <= 259:
+            return 66
+        elif run800 <= 264:
+            return 64
+        elif run800 <= 269:
+            return 62
+        elif run800 <= 274:
+            return 60
+        elif run800 <= 284:
+            return 50
+        elif run800 <= 294:
+            return 40
+        elif run800 <= 304:
+            return 30
+        elif run800 <= 314:
+            return 20
+        elif run800 <= 324:
+            return 10
+        else:
+            return 0
+    return
 
 
 
 def getrun1000_score(student):
-    grade = student.grade
-    if student.sSex == '男' and (grade in ['1', '2']):
+    if student.sSex == '男':
         run1000 = float(student.run1000)
-        time_score_intervals = [
-            ((195, 197), 100),
-            ((200, 202), 95),
-            ((205, 207), 90),
-            ((212, 214), 85),
-            ((220, 222), 80),
-            ((225, 227), 78),
-            ((230, 232), 76),
-            ((235, 237), 74),
-            ((240, 242), 72),
-            ((245, 247), 70),
-            ((250, 252), 68),
-            ((255, 257), 66),
-            ((260, 262), 64),
-            ((265, 267), 62),
-            ((270, 272), 60),
-            ((290, 292), 50),
-            ((310, 312), 40),
-            ((330, 332), 30),
-            ((350, 352), 20),
-            ((370, 372), 10)
-        ]
-        for interval, score in time_score_intervals:
-            start_time, end_time = interval
-            if start_time <= run1000 <= end_time:
-                return score
-        return 0
-    return 0
+        if run1000 <= 197:
+            return 100
+        elif run1000 <= 202:
+            return 95
+        elif run1000 <= 207:
+            return 90
+        elif run1000 <= 214:
+            return 85
+        elif run1000 <= 222:
+            return 80
+        elif run1000 <= 227:
+            return 78
+        elif run1000 <= 232:
+            return 76
+        elif run1000 <= 237:
+            return 74
+        elif run1000 <= 242:
+            return 72
+        elif run1000 <= 247:
+            return 70
+        elif run1000 <= 252:
+            return 68
+        elif run1000 <= 257:
+            return 66
+        elif run1000 <= 262:
+            return 64
+        elif run1000 <= 267:
+            return 62
+        elif run1000 <= 272:
+            return 60
+        elif run1000 <= 292:
+            return 50
+        elif run1000 <= 312:
+            return 40
+        elif run1000 <= 332:
+            return 30
+        elif run1000 <= 352:
+            return 20
+        elif run1000 <= 372:
+            return 10
+        else:
+            return 0
+    return
 
 
 def getoneMinuteSitUps_score(student):
@@ -1283,6 +1314,8 @@ def getoneMinuteSitUps_score(student):
         else:
             score = 0
         return score
+
+
 
 def getpullUP_score(student):
     grade = student.grade

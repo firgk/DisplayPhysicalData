@@ -25,7 +25,7 @@ class Student(db.Model, UserMixin):
     run1000 = db.Column(db.String(255), comment='1000米跑')
     oneMinuteSitUps = db.Column(db.String(255), comment='一分钟仰卧起坐')
     pullUP = db.Column(db.String(255), comment='引体向上')
-    update_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, comment='更新时间')
+    update_at = db.Column(db.String(255), comment='更新时间')
 
     score_bmi = db.Column(db.String(255), comment='成绩-bmi')  # 15% 体重指数（BMI）=体重（千克）/身高^2（米^2）。
     score_sVitalCapacity = db.Column(db.String(255), comment='成绩-肺活量')  # 15%

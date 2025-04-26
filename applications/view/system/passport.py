@@ -47,6 +47,9 @@ def login_post():
     user = User.query.filter_by(username=username).first()
     person = Student.query.filter_by(sNumber=username).first()
 
+    print(user)
+    print(person)
+
     if not user and not person:
         return fail_api(msg="不存在的用户")
 
@@ -80,7 +83,7 @@ def login_post():
         login_log(request, uid=user.id, is_access=False)
         return fail_api(msg="用户名或密码错误")
 
-    if person:
+    elif person:
         if person.enable == 0:
             return fail_api(msg="用户被暂停使用")
         if username == person.sNumber and person.validate_password(password):
@@ -88,26 +91,15 @@ def login_post():
             login_user(person, remember=remember)
             # 记录登录日志
             login_log(request, uid=person.id, is_access=True)
-            # 授权路由存入session
-            # role = current_user.role
             user_power = []
-            # for i in role:
-            #     if i.enable == 0:
-            #         continue
-            #     for p in i.power:
-            #         if p.enable == 0:
-            #             continue
-            #         user_power.append(p.code)
             session['permissions'] = user_power
             # # 角色存入session
             # roles = []
             # for role in current_user.role.all():
             #     roles.append(role.id)
             # session['role'] = [roles]
-
             return success_api(msg="登录成功")
 
-        login_log(request, uid=person.id, is_access=False)
         return fail_api(msg="用户名或密码错误")
 
 

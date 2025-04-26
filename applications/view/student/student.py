@@ -21,6 +21,7 @@ bp = Blueprint('student', __name__, url_prefix='/student')
 @authorize("student:data")
 def data():
     colleges = College.query.all()
+
     return render_template('student/data/main.html',colleges=colleges)
 
 
@@ -37,7 +38,7 @@ def dataCollege():
 
 
 
-
+# AAAAAAAAAAAAAA
 # 学生信息
 @bp.get('/data/data')
 @authorize("student:data")
@@ -45,17 +46,50 @@ def dataData():
     # 获取请求参数 姓名 学号
     real_name = str_escape(request.args.get('realname', type=str))
     username = str_escape(request.args.get('username', type=str))
+    classNum = str_escape(request.args.get('classNum', type=str))
+    grade = str_escape(request.args.get('grade', type=str))
+    collegeCode = str_escape(request.args.get('collegeCode', type=str))
+
 
     filters = []
     if real_name:
         filters.append(Student.sName.contains(real_name))
     if username:
         filters.append(Student.sNumber.contains(username))
+    if classNum:
+        filters.append(Student.classNum.contains(classNum))
+    if grade:
+        filters.append(Student.grade.contains(grade))
+    if collegeCode:
+        filters.append(Student.collegeCode.contains(collegeCode))
+
+
 
     # print(*filters)
     query = db.session.query(
         Student
     ).filter(*filters).layui_paginate()
+
+
+    for student in query.items:
+        if student.run800=='None':
+            student.run800='-'
+        if student.run1000=='None':
+            student.run1000='-'
+        if student.oneMinuteSitUps=='None':
+            student.oneMinuteSitUps='-'
+        if student.pullUP=='None':
+            student.pullUP='-'
+
+        if student.score_run800=='None':
+            student.score_run800='-'
+        if student.score_run1000=='None':
+            student.score_run1000='-'
+        if student.score_oneMinuteSitUps=='None':
+            student.score_oneMinuteSitUps='-'
+        if student.score_pullUP=='None':
+            student.score_pullUP='-'
+
 
     return table_api(
         data=[{
@@ -228,7 +262,7 @@ def infoCollege():
 
 
 
-
+# AAAAAAAAAAAAAA
 # 学生信息
 @bp.get('/info/data')
 @authorize("student:info")
@@ -260,6 +294,7 @@ def infoData():
         Student
     ).filter(*filters).layui_paginate()
 
+
     return table_api(
         data=[{
             'id': student.id,
@@ -273,6 +308,9 @@ def infoData():
             'sBirthDate': student.sBirthDate,
         } for student in query.items],
         count=query.total)
+
+
+
 
 
 #  编辑用户
@@ -371,6 +409,19 @@ def infoSave():
 @bp.get('/show/')
 @authorize("student:show")
 def show():
+    filters = []
+    filters.append(Student.id.in_([101,102,103,104,105,106,107,108,109,110]))
+    students = Student.query.filter(*filters).all()
+    # 批量更新学生记录
+
+    update_data = {}
+    update_data['sHeight'] = 'None'
+    for student in students:
+        Student.query.filter_by(id=student.id).update(update_data)
+
+    # 提交事务
+    db.session.commit()
+    print(f"成功更新 {len(students)} 条学生记录")
     return render_template('student/show/index.html')
 
 

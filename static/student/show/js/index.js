@@ -205,20 +205,16 @@
 
 
 // 柱状图2
+//不同群体体测平均成绩
 // 12
-
 (function () {
-  // 1.实例化对象
   var myChart = echarts.init(document.querySelector(".bar2 .chart"));
   
-  // 2.指定配置项和数据
   var option = {
     color: ['#2f89cf'],
     tooltip: {
       trigger: 'axis',
-      axisPointer: {
-        type: 'shadow'
-      }
+      formatter: '{b}<br/>平均成绩: {c}分<br/>'
     },
     grid: {
       left: '0%',
@@ -230,71 +226,93 @@
     xAxis: [{
       type: 'category',
       data: [],
-      axisTick: {
-        alignWithLabel: true
-      },
       axisLabel: {
         color: "rgba(255,255,255,0.8)",
-        fontSize: 10
+        fontSize: 10,
+        interval: 0,
+        rotate: 0
       },
-      axisLine: {
-        show: false
-      }
+      axisLine: { show: false }
     }],
     yAxis: [{
       type: 'value',
-      axisLabel: {
-        color: "rgba(255,255,255,0.6)",
+      name: '平均成绩',
+      min: 0,
+      max: 100,
+      interval: 20,
+      nameTextStyle: {
+        color: "rgba(255,255,255,0.8)",
         fontSize: 12
       },
-      axisLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,0.6)",
-          width: 2
-        }
+      axisLabel: {
+        color: "rgba(255,255,255,0.6)",
+        fontSize: 12,
+        formatter: '{value}分'
       },
       splitLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,0.1)"
-        }
+        lineStyle: { color: "rgba(255,255,255,0.1)" }
       }
     }],
     series: [{
-      name: '学生数量',
+      name: '平均成绩',
       type: 'bar',
       barWidth: '35%',
       data: [],
-      itemStyle: {
-        barBorderRadius: 5
+      itemStyle: { 
+        barBorderRadius: 5,
+        color: function(params) {
+          // 根据分数设置不同的颜色
+          var value = params.value;
+          if (value >= 90) return '#67C23A';  // 优秀
+          if (value >= 80) return '#409EFF';  // 良好
+          if (value >= 70) return '#E6A23C';  // 中等
+          if (value >= 60) return '#F56C6C';  // 及格
+          return '#909399';  // 不及格
+        }
       }
     }]
   };
 
-  // 3.获取数据并更新图表
-  $.ajax({
-    url: '/api/cluster_analysis_result',
-    type: 'GET',
-    success: function(res) {
-      if (res.success) {
-        var clusterStats = res.data.clusterStats;
-        // 只显示群体名称的第一部分（如"标准型"），保持简洁
-        option.xAxis[0].data = clusterStats.map(item => item.name.split('-')[0]);
-        option.series[0].data = clusterStats.map(item => item.value);
-        myChart.setOption(option);
-      } else {
-        console.error('获取聚类分析数据失败:', res.msg);
+  function loadData() {
+    $.ajax({
+      url: '/api/cluster_analysis_result',
+      type: 'GET',
+      success: function(res) {
+        if (res && res.success && res.data && Array.isArray(res.data.clusterStats)) {
+          var clusterStats = res.data.clusterStats;
+          option.xAxis[0].data = clusterStats.map(item => item.name);
+          option.series[0].data = clusterStats.map(item => ({
+            value: item.value || 0,
+            count: item.count || 0
+          }));
+          myChart.setOption(option);
+        } else {
+          showError('数据加载失败', res ? res.msg : '未知错误');
+        }
+      },
+      error: function() {
+        showError('数据加载失败', '请检查网络连接');
       }
-    },
-    error: function(err) {
-      console.error('请求聚类分析数据失败:', err);
-    }
-  });
+    });
+  }
 
-  // 4.让图表随屏幕自适应
-  window.addEventListener('resize', function () {
-    myChart.resize();
-  })
+  function showError(title, subtext) {
+    myChart.setOption({
+      title: {
+        text: title,
+        subtext: subtext,
+        left: 'center',
+        top: 'center',
+        textStyle: { color: '#fff' }
+      }
+    });
+  }
+
+  loadData();
+  window.addEventListener('resize', () => myChart.resize());
+  setInterval(loadData, 5 * 60 * 1000);
 })();
+
 
 
 
@@ -420,167 +438,131 @@
 // 折线图2
 // 体测成绩时间序列趋势
 // 22
-
 (function () {
   var myChart = echarts.init(document.querySelector('.line2 .chart'));
 
-  var option = {
-    tooltip: {
-      trigger: 'axis',
-    },
-    legend: {
-      top: "0%",
-      textStyle: {
-        color: "rgba(255,255,255,.5)",
-        fontSize: "12"
-      }
-    },
-    grid: {
-      top: '30',
-      left: '10',
-      right: '30',
-      bottom: '10',
-      containLabel: true
-    },
-    xAxis: [{
-      type: 'category',
-      boundaryGap: false,
-      // 文本颜色为rgba(255,255,255,.6)  文字大小为 12
-      axisLabel: {
-        textStyle: {
-          color: "rgba(255,255,255,.6)",
-          fontSize: 12
-        }
-      },
-      // x轴线的颜色为   rgba(255,255,255,.2)
-      axisLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,.2)"
-        }
-      },
-      data: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "26", "28", "29", "30"]
-    }],
-    yAxis: [{
-      type: 'value',
-      axisTick: {
-        // 不显示刻度线
-        show: false
-      },
-      axisLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,.1)"
-        }
-      },
-      axisLabel: {
-        textStyle: {
-          color: "rgba(255,255,255,.6)",
-          fontSize: 12
-        }
-      },
-      // 修改分割线的颜色
-      splitLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,.1)"
-        }
-      }
-    }],
-    series: [{
-      name: '邮件营销',
-      type: 'line',
-      smooth: true, // 圆滑的线
-      // 单独修改当前线条的样式
-      lineStyle: {
-        color: "#0184d5",
-        width: 2
-      },
-      // 填充区域渐变透明颜色
-      areaStyle: {
-        color: new echarts.graphic.LinearGradient(
-          0,
-          0,
-          0,
-          1,
-          [{
-            offset: 0,
-            color: "rgba(1, 132, 213, 0.4)" // 渐变色的起始颜色
-          },
-          {
-            offset: 0.8,
-            color: "rgba(1, 132, 213, 0.1)" // 渐变线的结束颜色
-          }
-          ],
-          false
-        ),
-        shadowColor: "rgba(0, 0, 0, 0.1)"
-      },
-      // 拐点设置为小圆点
-      symbol: 'circle',
-      // 设置拐点大小
-      symbolSize: 5,
-      // 开始不显示拐点， 鼠标经过显示
-      showSymbol: false,
-      // 设置拐点颜色以及边框
-      itemStyle: {
-        color: "#0184d5",
-        borderColor: "rgba(221, 220, 107, .1)",
-        borderWidth: 12
-      },
-      data: [30, 40, 30, 40, 30, 40, 30, 60, 20, 40, 30, 40, 30, 40, 30, 40, 30, 60, 20, 40, 30, 40, 30, 40, 30, 40, 20, 60, 50, 40]
-    },
-    {
-      name: "转发量",
-      type: "line",
-      smooth: true,
-      lineStyle: {
-        normal: {
-          color: "#00d887",
-          width: 2
-        }
-      },
-      areaStyle: {
-        normal: {
-          color: new echarts.graphic.LinearGradient(
-            0,
-            0,
-            0,
-            1,
-            [{
-              offset: 0,
-              color: "rgba(0, 216, 135, 0.4)"
-            },
-            {
-              offset: 0.8,
-              color: "rgba(0, 216, 135, 0.1)"
-            }
-            ],
-            false
-          ),
-          shadowColor: "rgba(0, 0, 0, 0.1)"
-        }
-      },
-      // 设置拐点 小圆点
-      symbol: "circle",
-      // 拐点大小
-      symbolSize: 5,
-      // 设置拐点颜色以及边框
-      itemStyle: {
-        color: "#00d887",
-        borderColor: "rgba(221, 220, 107, .1)",
-        borderWidth: 12
-      },
-      // 开始不显示拐点， 鼠标经过显示
-      showSymbol: false,
-      data: [130, 10, 20, 40, 30, 40, 80, 60, 20, 40, 90, 40, 20, 140, 30, 40, 130, 20, 20, 40, 80, 70, 30, 40, 30, 120, 20, 99, 50, 20]
-    }
-    ]
-  };
+  // 从后端获取数据
+  $.ajax({
+    url: '/api/single_day_test_count_data_statistics',
+    type: 'GET',
+    success: function(res) {
+      if (res.success) {
+        var dates = res.data.dates;
+        var counts = res.data.counts;
+        
+        // 格式化日期显示
+        var formattedDates = dates.map(date => {
+          var parts = date.split('-');
+          return parts[1]; // 只显示月份数字
+        });
 
-  myChart.setOption(option);
+        var option = {
+          tooltip: {
+            trigger: 'axis',
+            formatter: function(params) {
+              var date = dates[params[0].dataIndex];
+              return date + '<br/>体测人数: ' + params[0].value;
+            }
+          },
+          legend: {
+            top: "0%",
+            textStyle: {
+              color: "rgba(255,255,255,.5)",
+              fontSize: "12"
+            }
+          },
+          grid: {
+            top: '30',
+            left: '10',
+            right: '30',
+            bottom: '10',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            axisLabel: {
+              color: "rgba(255,255,255,.6)",
+              fontSize: 12,
+              interval: function(index, value) {
+                // 只显示每个月的第一天
+                var date = dates[index];
+                return date.split('-')[2] === '01';
+              },
+              rotate: 0 // 不旋转标签
+            },
+            axisLine: {
+              lineStyle: {
+                color: "rgba(255,255,255,.2)"
+              }
+            },
+            data: formattedDates
+          },
+          yAxis: {
+            type: 'value',
+            axisTick: { show: false },
+            axisLine: {
+              lineStyle: {
+                color: "rgba(255,255,255,.1)"
+              }
+            },
+            axisLabel: {
+              color: "rgba(255,255,255,.6)",
+              fontSize: 12
+            },
+            splitLine: {
+              lineStyle: {
+                color: "rgba(255,255,255,.1)"
+              }
+            }
+          },
+          series: [{
+            name: '体测日期',
+            type: 'line',
+            smooth: true,
+            lineStyle: {
+              color: "#0184d5",
+              width: 2
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: "rgba(1, 132, 213, 0.4)" },
+                { offset: 0.8, color: "rgba(1, 132, 213, 0.1)" }
+              ])
+            },
+            symbol: 'circle',
+            symbolSize: 5,
+            showSymbol: false,
+            itemStyle: {
+              color: "#0184d5"
+            },
+            data: counts
+          }]
+        };
+
+        myChart.setOption(option);
+      }
+    },
+    error: function(err) {
+      console.error('获取体测数据失败:', err);
+    }
+  });
 
   window.addEventListener('resize', function () {
     myChart.resize();
-  })
+  });
 })();
+
+
+
+
+
+
+
+
+
+
+
 
 
 

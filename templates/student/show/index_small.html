@@ -9,7 +9,8 @@
   <body>
     <!-- 头部 -->
     <header>
-      <!-- <h1>数据分析</h1> -->
+      <h1>大学生体测分析与可视化</h1>
+      <div class="show-time"></div>
       <script>
         var t = null;
         t = setTimeout(time, 1000); //开始运行
@@ -70,8 +71,8 @@
         <div class="no">
           <div class="no-hd">
             <ul>
-              <li>12434</li>
-              <li>10983</li>
+              <li id="data1">XXXXX</li>
+              <li id="data2">XXXXX</li>
             </ul>
           </div>
           <div class="no-bd">
@@ -97,7 +98,7 @@
           <div class="panel-footer"></div>
         </div>
         <div class="panel line2">
-          <h2>体测成绩时间序列趋势</h2>
+          <h2>单日体测个数数据统计</h2>
           <div class="chart"></div>
           <div class="panel-footer"></div>
         </div>
@@ -110,10 +111,10 @@
     </section>
 
 
-  <script src="{{ url_for('static', filename='student/show_small/js/flexible.js') }}"></script>
-  <script src="{{ url_for('static', filename='student/show_small/js/echarts.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='student/show_small/js/jquery.js') }}"></script>
-  <script src="{{ url_for('static', filename='student/show_small/js/china.js') }}"></script>
-  <script src="{{ url_for('static', filename='student/show_small/js/index.js') }}"></script>
+  <script src="{{ url_for('static', filename='student/show/js/flexible.js') }}"></script>
+  <script src="{{ url_for('static', filename='student/show/js/echarts.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='student/show/js/jquery.js') }}"></script>
+  <script src="{{ url_for('static', filename='student/show/js/china.js') }}"></script>
+  <script src="{{ url_for('static', filename='student/show/js/index.js') }}"></script>
   </body>
 </html>

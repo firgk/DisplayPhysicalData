@@ -123,6 +123,71 @@
                 </div>
             </div>
 
+            <!-- 聚类分析结果 -->
+            {% if cluster_info %}
+            <div class="layui-card" style="margin-top: 20px; background-color: #f0f9eb;">
+                <div class="layui-card-header">
+                    <span>聚类分析结果</span>
+                </div>
+                <div class="layui-card-body">
+                    <div class="basic-info">
+                        <div class="basic-info-item">
+                            <span class="label">所属类别：</span>
+                            <span class="value">{{ cluster_info.cluster }}</span>
+                        </div>
+                        <div class="basic-info-item">
+                            <span class="label">类别特征：</span>
+                            <span class="value">{{ cluster_info.description }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 类别特征详情 -->
+                    <div class="layui-card" style="margin-top: 15px; background-color: #fff;">
+                        <div class="layui-card-header">类别特征详情</div>
+                        <div class="layui-card-body">
+                            <table class="layui-table">
+                                <thead>
+                                    <tr>
+                                        <th>特征项</th>
+                                        <th>平均值</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for key, value in cluster_info.characteristics.items() %}
+                                    <tr>
+                                        <td>{{ key }}</td>
+                                        <td>{{ value }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 个性化建议 -->
+                    <div class="layui-card" style="margin-top: 15px; background-color: #fff;">
+                        <div class="layui-card-header">个性化建议</div>
+                        <div class="layui-card-body">
+                            {% if cluster_info.suggestions %}
+                                <ul class="layui-timeline">
+                                    {% for suggestion in cluster_info.suggestions %}
+                                    <li class="layui-timeline-item">
+                                        <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+                                        <div class="layui-timeline-content layui-text">
+                                            {{ suggestion }}
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>暂无个性化建议</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- BMI和总成绩 -->
             <div class="score-summary">
                 <div class="score-item">
@@ -207,7 +272,33 @@
                     <span class="value score-bad">{{ user.score_errormessage }}</span>
                 </div>
             </div>
+            {% else %}
+            <div class="layui-card" style="margin-top: 20px; background-color: #f6ffed;">
+                <div class="layui-card-body">
+                    <span class="label">异常信息：</span>
+                    <span class="value score-good">无异常</span>
+                </div>
+            </div>
             {% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         </div>
     </div>
 </div>

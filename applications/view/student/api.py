@@ -21,6 +21,7 @@ import os
 bp = Blueprint('api', __name__, url_prefix='/api')
 
 
+
 @bp.get('/distribution_of_actual_test_scores')
 @login_required  # 如果需要用户登录，取消注释
 def distribution_of_actual_test_scores():
@@ -152,16 +153,17 @@ def grade_score_distribution():
             score = float(student.score_allScore) if student.score_allScore else 0
             
             # 根据成绩划分等级
-            if score >= 80:
+            if score >= 75:
                 grade_data[grade]['优秀'] += 1
-            elif score >= 70:
+            elif score >= 65 and score < 75:
                 grade_data[grade]['良好'] += 1
-            elif score >= 60:
+            elif score >= 60 and score < 70:
                 grade_data[grade]['及格'] += 1
             elif score < 60:
                 grade_data[grade]['不及格'] += 1
-        except (ValueError, TypeError):
-            continue
+
+        except (ValueError, TypeError) as e:
+            print(f"处理学生 {student.sNumber} 时发生错误: {str(e)}")  # 添加调试信息
     
     # 格式化数据为前端需要的格式
     result = {
@@ -407,123 +409,6 @@ def error_statistics():
 
 
 
-# 使用聚类算法，对学生体测数据进行聚类分析，分析不同群体特征，并给出决策建议
-# 传入一个学生的id，返回聚类结果，和决策建议
-#
-
-@bp.get('/student_cluster_analysis/<int:student_id>')
-@login_required
-def student_cluster_analysis(student_id):
-    try:
-        # 获取所有学生数据
-        students = db.session.query(Student).all()
-        target_student = db.session.query(Student).filter_by(id=student_id).first()
-        
-        if not target_student:
-            return fail_api(msg="未找到指定学生")
-        
-        # 准备数据
-        features = []
-        valid_students = []
-        
-        for student in students:
-            try:
-                # 提取特征（身高、体重、肺活量、50米跑、立定跳远、坐位体前屈）
-                height = float(student.sHeight)
-                weight = float(student.sWeight)
-                vital_capacity = float(student.sVitalCapacity)
-                run_50 = float(student.run50)
-                long_jump = float(student.standingLongJump)
-                sit_forward = float(student.sittingForward)
-                
-                # 根据性别添加特定项目
-                if student.sSex == '男':
-                    run_long = float(student.run1000)
-                    strength = float(student.pullUP)
-                else:
-                    run_long = float(student.run800)
-                    strength = float(student.oneMinuteSitUps)
-                
-                features.append([
-                    height, weight, vital_capacity, 
-                    run_50, long_jump, sit_forward,
-                    run_long, strength
-                ])
-                valid_students.append(student)
-                
-            except (ValueError, TypeError, AttributeError):
-                continue
-        
-        if not features:
-            return fail_api(msg="没有足够的有效数据进行分析")
-        
-        # 数据标准化
-        scaler = StandardScaler()
-        features_scaled = scaler.fit_transform(features)
-        
-        # K-means聚类
-        n_clusters = 4  # 将学生分为4个群体
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-        clusters = kmeans.fit_predict(features_scaled)
-        
-        # 找到目标学生所属的簇
-        target_index = valid_students.index(target_student)
-        target_cluster = clusters[target_index]
-        
-        # 分析目标学生所在簇的特征
-        cluster_students = [s for i, s in enumerate(valid_students) if clusters[i] == target_cluster]
-        
-        # 计算簇的平均值
-        cluster_features = np.array([features[i] for i, c in enumerate(clusters) if c == target_cluster])
-        cluster_means = np.mean(cluster_features, axis=0)
-        
-        # 生成分析报告
-        analysis = {
-            "cluster_size": len(cluster_students),
-            "total_students": len(valid_students),
-            "cluster_characteristics": {
-                "平均身高": round(cluster_means[0], 2),
-                "平均体重": round(cluster_means[1], 2),
-                "平均肺活量": round(cluster_means[2], 2),
-                "50米跑平均成绩": round(cluster_means[3], 2),
-                "立定跳远平均成绩": round(cluster_means[4], 2),
-                "坐位体前屈平均成绩": round(cluster_means[5], 2),
-                "长跑平均成绩": round(cluster_means[6], 2),
-                "力量项目平均成绩": round(cluster_means[7], 2)
-            }
-        }
-        
-        # 生成建议
-        suggestions = []
-        student_features = features[target_index]
-        
-        # 比较学生个人成绩与簇平均值，生成针对性建议
-        if student_features[2] < cluster_means[2] * 0.9:  # 肺活量
-            suggestions.append("您的肺活量低于群体平均水平，建议通过游泳、跑步等有氧运动来提高心肺功能")
-            
-        if student_features[3] > cluster_means[3] * 1.1:  # 50米跑
-            suggestions.append("您的短跑成绩有提升空间，建议加强速度训练和爆发力训练")
-            
-        if student_features[4] < cluster_means[4] * 0.9:  # 立定跳远
-            suggestions.append("您的下肢爆发力有待提高，建议加强深蹲、跳跃等针对性训练")
-            
-        if student_features[5] < cluster_means[5] * 0.9:  # 坐位体前屈
-            suggestions.append("您的柔韧性需要提高，建议每天进行拉伸训练")
-            
-        if len(suggestions) == 0:
-            suggestions.append("您的各项指标都处于良好水平，建议保持当前的训练状态")
-        
-        return jsonify({
-            "success": True,
-            "msg": "分析完成",
-            "analysis": analysis,
-            "suggestions": suggestions
-        })
-        
-    except Exception as e:
-        return fail_api(msg=f"分析过程中发生错误: {str(e)}")
-
-
 @bp.get('/cluster_analysis_result')
 @login_required
 def cluster_analysis_result():
@@ -535,106 +420,185 @@ def cluster_analysis_result():
         # 读取JSON文件
         with open(json_file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-            
-        # 根据群体特征确定群体名称
-        def determine_cluster_name(features):
-            # 获取关键指标
-            run_50 = float(features['50米跑平均成绩'])
-            long_jump = float(features['立定跳远平均成绩'])
-            vital_capacity = float(features['平均肺活量'])
-            sit_forward = float(features['坐位体前屈平均成绩'])
-            strength = float(features['力量项目平均成绩'])
-            height = float(features['平均身高'])
-            weight = float(features['平均体重'])
-            
-            # 计算BMI
-            height_m = height / 100  # 转换为米
-            bmi = weight / (height_m * height_m)
-            
-            # 判断各项指标的水平
-            # 力量型特征
-            is_strong = (strength > 30 and long_jump > 200) or long_jump > 220
-            # 速度型特征
-            is_fast = run_50 < 8.3
-            # 耐力型特征
-            has_endurance = vital_capacity > 3000
-            # 柔韧性特征
-            is_flexible = sit_forward > 15
-            # 体能待发展特征
-            needs_improvement = run_50 > 8.8 or long_jump < 180 or vital_capacity < 2800
-            
-            # 根据特征组合确定类型
-            if is_strong and is_fast:
-                return "速度力量型"
-            elif is_strong and has_endurance:
-                return "力量耐力型"
-            elif is_fast and is_flexible:
-                return "速度灵敏型"
-            elif has_endurance and is_flexible:
-                return "耐力柔韧型"
-            elif needs_improvement:
-                return "体能发展型"
-            else:
-                return "综合平衡型"
-            
-        # 处理数据以适应图表展示
-        cluster_stats_dict = {}
         
-        # 首先将相同类型的群体数据合并
-        for cluster in data['clusters']:
-            cluster_name = determine_cluster_name(cluster['簇特征'])
-            if cluster_name not in cluster_stats_dict:
-                cluster_stats_dict[cluster_name] = {
-                    'name': cluster_name,
-                    'value': 0,
-                    'features': {k: 0 for k in cluster['簇特征'].keys()},
-                    'count': 0
-                }
+        # 处理聚类数据
+        cluster_stats = []
+        for cluster in data.get('clusters', []):
+            # 计算该簇的平均成绩
+            features = cluster.get('簇特征', {})
             
-            # 累加学生数量
-            cluster_stats_dict[cluster_name]['value'] += cluster['学生数量']
-            # 累加特征值（用于后面计算平均值）
-            for k, v in cluster['簇特征'].items():
-                cluster_stats_dict[cluster_name]['features'][k] += float(v) * cluster['学生数量']
-            cluster_stats_dict[cluster_name]['count'] += cluster['学生数量']
-        
-        # 计算合并后的平均特征值
-        for cluster_info in cluster_stats_dict.values():
-            for k in cluster_info['features'].keys():
-                cluster_info['features'][k] = round(
-                    cluster_info['features'][k] / cluster_info['count'], 
-                    2 if k in ['平均身高', '平均体重'] else 1
-                )
-            del cluster_info['count']  # 删除临时计数字段
-        
-        # 转换为列表并排序（按学生数量降序）
-        cluster_stats = sorted(
-            cluster_stats_dict.values(),
-            key=lambda x: x['value'],
-            reverse=True
-        )
+            # 计算各项成绩的标准化分数（0-100分）
+            scores = [
+                normalize_score(features.get('50米跑平均成绩', 0), 'run50'),
+                normalize_score(features.get('立定跳远平均成绩', 0), 'long_jump'),
+                normalize_score(features.get('坐位体前屈平均成绩', 0), 'sit_forward'),
+                normalize_score(features.get('长跑平均成绩', 0), 'run_long'),
+                normalize_score(features.get('力量项目平均成绩', 0), 'strength')
+            ]
             
+            # 计算平均分
+            avg_score = sum(scores) / len(scores)
+            
+            # 根据特征确定群体类型
+            cluster_type = determine_cluster_type(features)
+            
+            cluster_stats.append({
+                'name': cluster_type,
+                'value': round(avg_score, 2),
+                'count': cluster.get('学生数量', 0)
+            })
+        
         return jsonify({
             'success': True,
             'data': {
-                'clusterStats': cluster_stats,
-                'totalStudents': data['total_students'],
-                'clusterCount': len(cluster_stats),
-                'clusters': cluster_stats,
-                'recommendations': data['student_recommendations']
+                'clusterStats': cluster_stats
             }
         })
         
     except FileNotFoundError:
         return jsonify({
             'success': False,
-            'msg': '聚类分析数据文件不存在，请先运行聚类分析'
-        })
+            'msg': '聚类数据文件不存在'
+        }), 404
+    except json.JSONDecodeError:
+        return jsonify({
+            'success': False,
+            'msg': '聚类数据文件格式错误'
+        }), 500
     except Exception as e:
         return jsonify({
             'success': False,
-            'msg': f'读取聚类分析数据失败: {str(e)}'
+            'msg': f'获取聚类数据失败: {str(e)}'
+        }), 500
+# 结合上面
+def normalize_score(value, score_type):
+    """将原始成绩转换为0-100分的标准化分数"""
+    if score_type == 'run50':
+        # 50米跑：成绩越好分数越高，7秒为100分，12秒为60分
+        return max(60, min(100, 100 - (value - 7) * 8))
+    elif score_type == 'long_jump':
+        # 立定跳远：成绩越好分数越高，250cm为100分，180cm为60分
+        return max(60, min(100, 60 + (value - 180) * 0.57))
+    elif score_type == 'sit_forward':
+        # 坐位体前屈：成绩越好分数越高，20cm为100分，5cm为60分
+        return max(60, min(100, 60 + (value - 5) * 2.67))
+    elif score_type == 'run_long':
+        # 长跑：成绩越好分数越高，240秒为100分，360秒为60分
+        return max(60, min(100, 100 - (value - 240) * 0.33))
+    elif score_type == 'strength':
+        # 力量项目：成绩越好分数越高，50个为100分，20个为60分
+        return max(60, min(100, 60 + (value - 20) * 1.33))
+    else:
+        return 60  # 默认及格分
+
+# 结合上面
+def determine_cluster_type(features):
+    """根据群体特征确定群体类型"""
+    # 获取各项指标
+    height = features.get('平均身高', 0)
+    weight = features.get('平均体重', 0)
+    vital_capacity = features.get('平均肺活量', 0)
+    run50 = features.get('50米跑平均成绩', 0)
+    long_jump = features.get('立定跳远平均成绩', 0)
+    sit_forward = features.get('坐位体前屈平均成绩', 0)
+    run_long = features.get('长跑平均成绩', 0)
+    strength = features.get('力量项目平均成绩', 0)
+    
+    # 计算BMI
+    bmi = weight / ((height/100) ** 2) if height > 0 else 0
+    
+    # 根据特征判断群体类型
+    if bmi < 18.5:
+        if vital_capacity > 4500:
+            return "瘦高型-肺活量优"
+        else:
+            return "瘦高型-需加强"
+    elif 18.5 <= bmi <= 24:
+        if run50 < 7 and long_jump > 250:
+            return "标准型-爆发力强"
+        elif run_long < 240 and strength > 50:
+            return "标准型-耐力强"
+        else:
+            return "标准型-均衡发展"
+    else:
+        if run50 > 8 or run_long > 300:
+            return "偏重型-需减重"
+        else:
+            return "偏重型-需加强"
+
+
+
+
+
+
+
+# 单日体测个数数据统计
+
+@bp.get('/single_day_test_count_data_statistics')
+@login_required
+def single_day_test_count_data_statistics():
+    try:
+        # 获取所有学生数据
+        students = db.session.query(Student).all()
+        print(f"获取到的学生总数: {len(students)}")  # 调试信息
+        
+        # 初始化日期统计字典
+        date_stats = {}
+        
+        # 遍历所有学生
+        for student in students:
+            try:
+                # 获取学生的体测日期
+                test_date = student.update_at
+                
+                if test_date:
+                    # 如果日期是字符串，直接使用
+                    if isinstance(test_date, str):
+                        date_str = test_date.split()[0]  # 只取日期部分，去掉时间
+                    else:
+                        # 如果是日期对象，转换为字符串
+                        date_str = test_date.strftime('%Y-%m-%d')
+
+                    
+                    # 统计该日期的体测人数
+                    if date_str in date_stats:
+                        date_stats[date_str] += 1
+                    else:
+                        date_stats[date_str] = 1
+                else:
+                    print(f"学生 {student.sNumber} 没有体测日期")  # 调试信息
+                    
+            except (ValueError, TypeError, AttributeError) as e:
+                print(f"处理学生 {student.sNumber} 时发生错误: {str(e)}")  # 调试信息
+                continue
+        
+        print(f"统计到的日期数量: {len(date_stats)}")  # 调试信息
+        print(f"日期统计结果: {date_stats}")  # 调试信息
+        
+        # 按日期排序
+        sorted_dates = sorted(date_stats.keys())
+        
+        # 准备返回数据
+        result = {
+            'dates': sorted_dates,
+            'counts': [date_stats[date] for date in sorted_dates]
+        }
+        
+        return jsonify({
+            'success': True,
+            'data': result
         })
+        
+    except Exception as e:
+        print(f"发生错误: {str(e)}")  # 调试信息
+        return jsonify({
+            'success': False,
+            'msg': f'获取数据失败: {str(e)}'
+        })
+
+
+
+
 
 
 
@@ -671,6 +635,7 @@ def student_predictions():
             'msg': f'读取学生预测数据失败: {str(e)}'
         })
     
+
 
 
 
