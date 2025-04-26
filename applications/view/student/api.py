@@ -15,15 +15,18 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 import json
 import os
-
+from flask_caching import Cache
 
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
+# 初始化缓存
+cache = Cache()
 
 
 @bp.get('/distribution_of_actual_test_scores')
 @login_required  # 如果需要用户登录，取消注释
+@cache.cached(timeout=900)
 def distribution_of_actual_test_scores():
 
     students = db.session.query(Student).all()
@@ -66,6 +69,7 @@ def distribution_of_actual_test_scores():
 # 计算 各年级平均BMI
 @bp.get('/average_bmi_data')
 @login_required  # 如果需要用户登录，取消注释
+@cache.cached(timeout=900)
 def average_bmi_data():
     # 获取所有学生数据
     students = db.session.query(Student).all()
@@ -130,6 +134,7 @@ def average_bmi_data():
 
 @bp.get('/grade_score_distribution')
 @login_required
+@cache.cached(timeout=900)
 def grade_score_distribution():
     # 获取所有学生数据
     students = db.session.query(Student).all()
@@ -188,6 +193,7 @@ def grade_score_distribution():
 
 @bp.get('/completion_statistics')
 @login_required
+@cache.cached(timeout=900)
 def completion_statistics():
     # 获取所有学生数据
     students = db.session.query(Student).all()
@@ -251,6 +257,7 @@ def completion_statistics():
 # 各院系在校生参测率
 @bp.get('/college_participation_rate')
 @login_required
+@cache.cached(timeout=900)
 def college_participation_rate():
     # 获取所有学生数据
     students = db.session.query(Student).all()
@@ -335,6 +342,7 @@ def college_participation_rate():
 
 @bp.get('/error_statistics')
 @login_required
+@cache.cached(timeout=900)
 def error_statistics():
     # 获取所有学生数据
     students = db.session.query(Student).all()
@@ -411,6 +419,7 @@ def error_statistics():
 
 @bp.get('/cluster_analysis_result')
 @login_required
+@cache.cached(timeout=900)
 def cluster_analysis_result():
     try:
         # 获取JSON文件路径
@@ -536,6 +545,7 @@ def determine_cluster_type(features):
 
 @bp.get('/single_day_test_count_data_statistics')
 @login_required
+@cache.cached(timeout=900)
 def single_day_test_count_data_statistics():
     try:
         # 获取所有学生数据
@@ -605,6 +615,7 @@ def single_day_test_count_data_statistics():
 
 @bp.get('/student_predictions')
 @login_required
+@cache.cached(timeout=900)
 def student_predictions():
     try:
         # 获取JSON文件路径

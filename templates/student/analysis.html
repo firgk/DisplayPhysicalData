@@ -293,7 +293,7 @@
             <option value="hierarchical">层次聚类</option>
             <option value="dbscan">高斯混合模型</option>
         </select>
-        <button id="runAnalysis" class="btn btn-primary">运行分析</button>
+        <button id="runAnalysis" class="btn btn-primary">选择</button>
         
         <button id="generateReport" class="btn btn-primary" style="float: right; margin-right: 200px;">报告生成</button>
     </div>
@@ -321,6 +321,31 @@
 
     </div>
 
+
+
+
+
+    
+    <div class="container unreach-container" style="margin-top: 30px;">
+        <h2 class="section-title">未达标学生成绩预测分析</h2>
+        <div id="unreachAnalysisOverview">
+            <!-- 未达标分析概览数据 -->
+        </div>
+        <div id="unreachAnalysisRecommendations" style="margin-top: 20px;">
+            <!-- 未达标分析建议 -->
+        </div>
+        <div class="loading" id="unreachLoading" style="display: none;">
+            <i class="fas fa-spinner fa-2x"></i>
+            <p>正在加载预测分析数据...</p>
+        </div>
+    </div>
+
+
+
+
+
+
+    
 
     <div class="mainbox">
         <div class="column">
@@ -365,7 +390,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const loading = document.getElementById('loading');
@@ -375,6 +400,8 @@
 
             // 初始加载默认算法数据
             loadClusterData('kmeans');
+            // 加载未达标学生分析数据
+            loadUnreachAnalysisData();
 
             // 添加按钮点击事件
             runAnalysisBtn.addEventListener('click', function() {
@@ -524,6 +551,78 @@
                     mapCharts.forEach(chart => {
                         resizeObserver.observe(chart);
                     });
+                }
+            }
+
+            function loadUnreachAnalysisData() {
+                const loadingIndicator = document.getElementById('unreachLoading');
+                loadingIndicator.style.display = 'block';
+
+                fetch('/front/unreach-analysis')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 0 && data.data && data.data.总体评估) {
+                            renderUnreachAnalysis(data.data.总体评估);
+                        } else {
+                            // 显示错误信息或无数据提示
+                            const overviewDiv = document.getElementById('unreachAnalysisOverview');
+                            overviewDiv.innerHTML = `<p>无法加载未达标学生分析数据：${data.msg || '未知错误'}</p>`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching unreach analysis:', error);
+                        const overviewDiv = document.getElementById('unreachAnalysisOverview');
+                        overviewDiv.innerHTML = `<p>请求未达标学生分析数据失败。</p>`;
+                    })
+                    .finally(() => {
+                        loadingIndicator.style.display = 'none';
+                    });
+            }
+
+            function renderUnreachAnalysis(assessment) {
+                const overviewDiv = document.getElementById('unreachAnalysisOverview');
+                const recommendationsDiv = document.getElementById('unreachAnalysisRecommendations');
+
+                if (!assessment) {
+                    overviewDiv.innerHTML = '<p>未找到评估数据。</p>';
+                    recommendationsDiv.innerHTML = '';
+                    return;
+                }
+
+                overviewDiv.innerHTML = `
+                    <div class="overview">
+                        <div class="overview-card">
+                            <h3>参与分析学生数</h3>
+                            <p>${assessment.总学生数 || 0}</p>
+                        </div>
+                        <div class="overview-card" style="background-color: #e8f5e9;">
+                            <h3>进步学生 (${assessment.整体趋势?.进步学生百分比 || 0}%)</h3>
+                            <p>${assessment.整体趋势?.进步学生数 || 0}</p>
+                        </div>
+                        <div class="overview-card" style="background-color: #fffde7;">
+                            <h3>稳定学生 (${assessment.整体趋势?.稳定学生百分比 || 0}%)</h3>
+                            <p>${assessment.整体趋势?.稳定学生数 || 0}</p>
+                        </div>
+                        <div class="overview-card" style="background-color: #ffebee;">
+                            <h3>退步学生 (${assessment.整体趋势?.退步学生百分比 || 0}%)</h3>
+                            <p>${assessment.整体趋势?.退步学生数 || 0}</p>
+                        </div>
+                    </div>
+                `;
+
+                if (assessment.建议措施 && assessment.建议措施.length > 0) {
+                    recommendationsDiv.innerHTML = `
+                        <div class="recommendation-card">
+                             <h4 class="recommendation-title">总体建议措施</h4>
+                            <ul class="recommendation-list">
+                                ${assessment.建议措施.map(suggestion => `
+                                    <li class="recommendation-item">${suggestion}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    recommendationsDiv.innerHTML = '';
                 }
             }
         });

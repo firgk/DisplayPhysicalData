@@ -5,6 +5,7 @@ from datetime import datetime
 from faker import Faker
 from calScore import calculate_score
 from calError import calculate_error
+from calScore import calculate_score2
 from calKind import student_cluster_analysis
 from calKind import student_cluster_analysis2
 from calKind import student_cluster_analysis3
@@ -59,12 +60,28 @@ import pickle
 #
 
 
+class Unreach():
+    def __init__(self, id, student_id, grade, sSex, sHeight, sWeight, sVitalCapacity,run50, standingLongJump, sittingForward, run800, run1000, oneMinuteSitUps,pullUP):
+        self.id = id
+        self.student_id = student_id
+        self.grade = grade
+        self.sSex = sSex
+        self.sHeight = sHeight
+        self.sWeight = sWeight
+        self.sVitalCapacity = sVitalCapacity
+        self.run50 = run50
+        self.standingLongJump = standingLongJump
+        self.sittingForward = sittingForward
+        self.run800 = run800
+        self.run1000 = run1000
+        self.oneMinuteSitUps = oneMinuteSitUps
+        self.pullUP = pullUP
+
+
+
 
 class Student():
-    def __init__(self, id,collegeCode, grade,classNum, sNumber, sName, sSex, sBirthDate, sHeight, sWeight, sVitalCapacity,run50, standingLongJump, sittingForward, run800, run1000, oneMinuteSitUps, update_at,pullUP
-
-
-                 ):
+    def __init__(self, id,collegeCode, grade,classNum, sNumber, sName, sSex, sBirthDate, sHeight, sWeight, sVitalCapacity,run50, standingLongJump, sittingForward, run800, run1000, oneMinuteSitUps, update_at,pullUP):
         self.id = id
         self.collegeCode = collegeCode
         self.grade = grade
@@ -215,11 +232,11 @@ def generate_data(num,starter):
 
 
 
-# 生成30000条数据
+# 生成 30000 条数据
 
 students = []
 batch_size = 1000
-num_batches = 1
+num_batches = 31
 starter = 0
 for i in range(num_batches):
     datas = generate_data(batch_size,starter)
@@ -233,8 +250,8 @@ for i in range(num_batches):
 
 
 # 以二进制持久化 score_data 数据
-# with open('students30.bin', 'wb') as file:
-#     pickle.dump(students, file)
+with open('students31.bin', 'wb') as file:
+    pickle.dump(students, file)
 
 
 # 读取 score_data 数据
@@ -251,10 +268,134 @@ print("文件复制完成")
 
 
 print("\n正在聚类分析...")
-student_cluster_analysis(students,'student_clusters.json')
-student_cluster_analysis2(students,'student_clusters1.json')
-student_cluster_analysis3(students,'student_clusters2.json')
+student_cluster_analysis(students,'student_clusters31.json')
+student_cluster_analysis2(students,'student_clusters131.json')
+student_cluster_analysis3(students,'student_clusters231.json')
 print("聚类分析完成")
+
+import shutil
+# 拷贝文件student_clusters30.json 到 student_clusters.json
+shutil.copy2('student_clusters31.json', 'student_clusters.json')
+shutil.copy2('student_clusters131.json', 'student_clusters1.json')
+shutil.copy2('student_clusters231.json', 'student_clusters2.json')
+
+
+
+
+# unreach 表 再次构建数据
+unreach_students = []
+i=0
+for student in students:
+    if student.unreach == '1':
+        i=i+1
+        unreach_student = Unreach(
+            id=i,
+            student_id=student.id,
+            grade=student.grade,
+            sSex=student.sSex,
+            sHeight=student.sHeight,
+            sWeight='',
+            sVitalCapacity='',
+            run50='',
+            standingLongJump='',
+            sittingForward='',
+            run800='',
+            run1000='',
+            oneMinuteSitUps='',
+            pullUP=''
+        )
+        
+        if student.sSex == '男':
+            s_weight = generate_normal_data(65.1, 10)
+            s_vital_capacity = int(generate_normal_data(4800, 150))
+            run50 = generate_normal_data(6.3, 10)
+            standing_long_jump = generate_normal_data(270, 10)
+            sitting_forward = generate_normal_data(16.6, 10)
+            run1000 = generate_normal_data(240, 3)  # 平均值240秒，对应72分左右
+            pull_up = int(generate_normal_data(14.1, 10))
+            
+            unreach_student.sWeight = str(s_weight)
+            unreach_student.sVitalCapacity = str(s_vital_capacity)
+            unreach_student.run50 = str(run50)
+            unreach_student.standingLongJump = str(standing_long_jump)
+            unreach_student.sittingForward = str(sitting_forward)
+            unreach_student.run1000 = str(run1000)
+            unreach_student.pullUP = str(pull_up)
+        else:
+            s_weight = generate_normal_data(58.6, 10)
+            s_vital_capacity = int(generate_normal_data(3500, 10))
+            run50 = generate_normal_data(7.1, 10)
+            standing_long_jump = generate_normal_data(220, 10)
+            sitting_forward = generate_normal_data(14.7, 10)
+            run800 = generate_normal_data(230, 3)  # 平均值230秒，对应78分左右
+            one_minute_sit_ups = int(generate_normal_data(72.6, 10))
+            
+            unreach_student.sWeight = str(s_weight)
+            unreach_student.sVitalCapacity = str(s_vital_capacity)
+            unreach_student.run50 = str(run50)
+            unreach_student.standingLongJump = str(standing_long_jump)
+            unreach_student.sittingForward = str(sitting_forward)
+            unreach_student.run800 = str(run800)
+            unreach_student.oneMinuteSitUps = str(one_minute_sit_ups)
+        
+        unreach_student = calculate_score2(unreach_student)
+        unreach_students.append(unreach_student)
+    
+
+
+
+
+
+
+unreach_student_output = "unreach_datas = ["
+total = len(unreach_students)
+for i, data in enumerate(unreach_students, 1):
+    if i % 100 == 0:
+        print(f"处理进度: {i}/{total} ({i/total*100:.1f}%)")
+    unreach_student_output += f"""
+    Unreach(
+        id='{data.id}',
+        student_id='{data.student_id}',
+        grade='{data.grade}',
+        sSex='{data.sSex}',
+        sHeight='{data.sHeight}',
+        sWeight='{data.sWeight}',
+        sVitalCapacity='{data.sVitalCapacity}',
+        run50='{data.run50}',
+        standingLongJump='{data.standingLongJump}',
+        sittingForward='{data.sittingForward}',
+        run800='{data.run800}',
+        run1000='{data.run1000}',
+        oneMinuteSitUps='{data.oneMinuteSitUps}',
+        pullUP='{data.pullUP}',
+        score_bmi='{data.score_bmi}',
+        score_sVitalCapacity='{data.score_sVitalCapacity}',
+        score_run50='{data.score_run50}',
+        score_standingLongJump='{data.score_standingLongJump}',
+        score_sittingForward='{data.score_sittingForward}',
+        score_run800='{data.score_run800}',
+        score_run1000='{data.score_run1000}',
+        score_oneMinuteSitUps='{data.score_oneMinuteSitUps}',
+        score_pullUP='{data.score_pullUP}',
+        score_allScore='{data.score_allScore}',
+    ),"""
+output = unreach_student_output.rstrip(',') + "\n]"
+
+# print(output)
+
+with open('../applications/common/script/unreach.py', 'w', encoding='utf-8') as file:
+    file.write('from applications.models.unreach import Unreach\n')
+    file.write('\n')
+    file.write(output)
+
+
+
+
+
+
+
+
+
 
 
 
@@ -298,6 +439,8 @@ for i, data in enumerate(students, 1):
         score_oneMinuteSitUps='{data.score_oneMinuteSitUps}',
         score_pullUP='{data.score_pullUP}',
         score_allScore='{data.score_allScore}',
+        
+        unreach='{data.unreach}',
         
         score_error='{data.score_error}',
         score_errormessage='{data.score_errormessage}',

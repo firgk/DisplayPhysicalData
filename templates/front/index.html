@@ -188,6 +188,88 @@
             </div>
             {% endif %}
 
+            <!-- 预测分析结果 -->
+            {% if prediction_info %}
+            <div class="layui-card" style="margin-top: 20px; background-color: #e6f7ff;">
+                <div class="layui-card-header">
+                    <span>成绩预测分析</span>
+                </div>
+                <div class="layui-card-body">
+                    <!-- 时间序列分析 -->
+                    {% if prediction_info.time_series and prediction_info.time_series.项目预测 %}
+                    <div class="layui-card" style="margin-bottom: 15px; background-color: #fff;">
+                        <div class="layui-card-header">时间序列分析 (单项预测)</div>
+                        <div class="layui-card-body">
+                            <table class="layui-table">
+                                <thead>
+                                    <tr>
+                                        <th>项目名称</th>
+                                        <th>第一次成绩</th>
+                                        <th>第二次成绩</th>
+                                        <th>变化趋势</th>
+                                        <th>预测下次成绩</th>
+                                        <th>评估</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in prediction_info.time_series.项目预测 %}
+                                    <tr>
+                                        <td>{{ item.项目名称 }}</td>
+                                        <td>{{ item.第一次成绩 }}</td>
+                                        <td>{{ item.第二次成绩 }}</td>
+                                        <td>{{ item.变化趋势 }}</td>
+                                        <td>{{ item.预测下次成绩 }}</td>
+                                        <td>{{ item.评估 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- 回归分析 -->
+                    {% if prediction_info.regression %}
+                    <div class="layui-card" style="background-color: #fff;">
+                        <div class="layui-card-header">回归分析 (综合评估)</div>
+                        <div class="layui-card-body">
+                            {% if prediction_info.regression.总体预测 %}
+                                <p style="font-weight: bold; margin-bottom: 15px;">总体预测：{{ prediction_info.regression.总体预测 }}</p>
+                            {% endif %}
+
+                            {% if prediction_info.regression.体能评估 %}
+                            <table class="layui-table">
+                                <thead>
+                                    <tr>
+                                        <th>项目</th>
+                                        <th>首次成绩</th>
+                                        <th>补测成绩</th>
+                                        <th>改进率 (%)</th>
+                                        <th>预测成绩</th>
+                                        <th>评估</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in prediction_info.regression.体能评估 %}
+                                    <tr>
+                                        <td>{{ item.项目 }}</td>
+                                        <td>{{ item.首次成绩 }}</td>
+                                        <td>{{ item.补测成绩 }}</td>
+                                        <td>{{ item.改进率 }}</td>
+                                        <td>{{ item.预测成绩 }}</td>
+                                        <td>{{ item.评估 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
             <!-- BMI和总成绩 -->
             <div class="score-summary">
                 <div class="score-item">

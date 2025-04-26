@@ -10,8 +10,12 @@ from applications.common.utils.validate import str_escape
 from applications.extensions import db
 from applications.models import Role, College
 from applications.models import User, AdminLog, Student
+from flask_caching import Cache
 
 bp = Blueprint('student', __name__, url_prefix='/student')
+
+# 初始化缓存
+cache = Cache()
 
 
 
@@ -252,6 +256,7 @@ def info():
 # 学生信息
 @bp.get('/info/college')
 @authorize("student:info")
+@cache.cached(timeout=900)
 def infoCollege():
     colleges = College.query.all()
     return jsonify([{
@@ -266,6 +271,7 @@ def infoCollege():
 # 学生信息
 @bp.get('/info/data')
 @authorize("student:info")
+@cache.cached(timeout=900)
 def infoData():
     # 获取请求参数 姓名 学号
     real_name = str_escape(request.args.get('realname', type=str))
@@ -316,6 +322,7 @@ def infoData():
 #  编辑用户
 @bp.get('/info/edit/<int:id>')
 @authorize("student:info")
+@cache.cached(timeout=900)
 def infoEdit(id):
     student = curd.get_one_by_id(Student, id)
     colleges = College.query.all()
@@ -369,6 +376,7 @@ def dis_enable():
 # 成绩录入
 @bp.get('/info/add/')
 @authorize("student:add")
+@cache.cached(timeout=900)
 def infoAdd():
     colleges = College.query.all()
     return render_template('student/add.html', colleges=colleges)

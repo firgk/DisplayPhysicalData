@@ -1,14 +1,77 @@
 
 
 依托
+
 Pear Admin Flask
-还未完成
+
+
+### 使用项目
+
+```
+创建虚拟环境 venv
+cd venv
+git clone git@github.com:firgk/DisplayPhysicalData.git
+cd DisplayPhysicalData
+
+启动项目
+flask --app app.py run -h 0.0.0.0 -p 8000 --debug
+or
+flask --app app.py run -h 0.0.0.0 -p 8000
+or
+python app.py
+
+```
+
+
+
+
+````
+密码 123456
+账号如下：
+
+admin
+dean
+input
+show
+
+
+
+不及格之后补测的
+
+4917031304
+6757807427
+
+
+没有补测的
+
+7003341534
+5717270489
+
 
 
 
 ```
-init_login
 
+
+
+```
+
+
+修改权限管理之后重新登陆生效
+
+@bp.get('/show/')
+show 后要加 / 否则会报错
+
+循环引用导致出错
+
+view/system/rights.py 可以修改部分设置
+
+
+
+
+
+
+init_login
 
 from flask_login import LoginManager
 
@@ -30,3 +93,7 @@ def init_login_manager(app):
         student = Student.query.get(int(user_id))
         return student
 ```
+
+
+
+

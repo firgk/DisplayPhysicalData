@@ -59,10 +59,75 @@ def calculate_score(student):
     student.score_oneMinuteSitUps=oneMinuteSitUps_score
     student.score_pullUP=pullUP_score
     student.score_allScore=all_score
-
+    if all_score<60:
+        student.unreach='1'
+    else:
+        student.unreach='0'
     return student
 
 
+
+
+
+def calculate_score2(student):
+
+    # 计算BMI
+    bmi = round(float(student.sWeight) / ((float(student.sHeight) / 100) ** 2), 2)
+    # 各项成绩占比
+    bmi_weight = 0.15
+    sVitalCapacity_weight = 0.15
+    run50_weight = 0.2
+    standingLongJump_weight = 0.1
+    sittingForward_weight = 0.1
+    run800_weight = 0.2
+    run1000_weight = 0.2
+    oneMinuteSitUps_weight = 0.1
+    pullUP_weight = 0.1
+
+    # 各项成绩原始分（这里简单假设为直接使用成绩数值，实际需根据评分标准转换）
+    bmi_score = getBmi_score(student,bmi)
+    sVitalCapacity_score = getsVitalCapacity_score(student)
+    run50_score = getrun50_score(student)
+    standingLongJump_score = getstandingLongJump_score(student)
+    sittingForward_score = getsittingForward_score(student)
+    run800_score = getrun800_score(student)
+    run1000_score = getrun1000_score(student)
+    oneMinuteSitUps_score = getoneMinuteSitUps_score(student)
+    pullUP_score = getpullUP_score(student)
+    if student.sSex == '女':
+        all_score = round(
+                bmi_score * bmi_weight +
+                float(sVitalCapacity_score) * sVitalCapacity_weight +
+                float(run50_score) * run50_weight +
+                float(standingLongJump_score) * standingLongJump_weight +
+                float(sittingForward_score) * sittingForward_weight +
+                float(run800_score) * run800_weight +
+                float(oneMinuteSitUps_score) * oneMinuteSitUps_weight
+        , 2)
+    elif student.sSex == '男':
+        all_score = round(
+                bmi_score * bmi_weight +
+                float(sVitalCapacity_score) * sVitalCapacity_weight +
+                float(run50_score) * run50_weight +
+                float(standingLongJump_score) * standingLongJump_weight +
+                float(sittingForward_score) * sittingForward_weight +
+                float(run1000_score) * run1000_weight +
+                float(pullUP_score) * pullUP_weight
+        , 2)
+    else:
+        print("ERROR: 性别不明")
+
+    student.score_bmi=bmi
+    student.score_sVitalCapacity=sVitalCapacity_score
+    student.score_run50=run50_score
+    student.score_standingLongJump=standingLongJump_score
+    student.score_sittingForward=sittingForward_score
+    student.score_run800=run800_score
+    student.score_run1000=run1000_score
+    student.score_oneMinuteSitUps=oneMinuteSitUps_score
+    student.score_pullUP=pullUP_score
+    student.score_allScore=all_score
+    return student
 
 
 

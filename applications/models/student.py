@@ -44,6 +44,7 @@ class Student(db.Model, UserMixin):
     password_hash = db.Column(db.String(128), comment='哈希密码')
     enable = db.Column(db.Integer, default=0, comment='启用')
 
+    unreach = db.Column(db.String(255), comment='是否及格') # 0 正常 1 未及格
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

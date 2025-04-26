@@ -6,6 +6,7 @@ from applications.extensions import db
 from applications.models import User, Role, Power
 from applications.common.script.student import datas
 from applications.common.script.userdata import userdata
+from applications.common.script.unreach import unreach_datas
 from applications.common.script.college import colleges
 from applications.common.script.roledata import roledata
 from applications.common.script.powerdata import powerdata
@@ -30,6 +31,9 @@ def init_db():
     print("加载 student datas")
     db.session.add_all(colleges)
     print("加载 student colleges")
+
+    db.session.add_all(unreach_datas)
+    print("加载 student unreach_datas")
 
 
     db.session.add_all(powerdata)

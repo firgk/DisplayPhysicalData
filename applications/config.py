@@ -1,6 +1,9 @@
 import logging
 from datetime import timedelta
+import os
 
+# 在 BaseConfig 类定义前加载
+basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 class BaseConfig:
     # 超级管理员账号
@@ -60,8 +63,9 @@ class BaseConfig:
 
 
 
-    # TODO 移动到上级当前目录不可以
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///../pear.db'
+    # TODO 移动到上级当前目录不可以    SQLALCHEMY_DATABASE_URI = 'sqlite:///pear.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'pear.db')
+
 
     # 默认日志等级
     LOG_LEVEL = logging.WARN
