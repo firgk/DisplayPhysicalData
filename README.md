@@ -24,8 +24,8 @@ Pear Admin Flask
 ### 使用项目
 
 ```
-创建虚拟环境 venv
-cd venv
+创建虚拟环境 test_venv
+cd test_venv
 激活虚拟环境
 ...
 克隆项目
