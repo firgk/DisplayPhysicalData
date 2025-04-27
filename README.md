@@ -103,6 +103,10 @@ show
 
 ```
 
+sqlalchemy.exc.IntegrityError: (pymysql.err.IntegrityError) (1062, "Duplicate entry '1' for key 'PRIMARY'")
+mysql 主键不可以设置为0
+
+
 修改权限管理之后重新登陆生效
 
 @bp.get('/show/')

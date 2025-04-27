@@ -61,10 +61,13 @@ class BaseConfig:
 
     # 数据库的配置信息
 
+    
 
-
-    # TODO 移动到上级当前目录不可以    SQLALCHEMY_DATABASE_URI = 'sqlite:///pear.db'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'pear.db')
+    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:123456@127.0.0.1:3305/pear?charset=utf8'
+
+    # SQLALCHEMY_DATABASE_URI="mysql+pymysql://root:123456@127.0.0.1:3305/pear"
+    # SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
     # 默认日志等级

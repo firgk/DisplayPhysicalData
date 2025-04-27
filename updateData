@@ -1,5 +1,4 @@
 rm -rf migrations/
-rm -f ../pear.db
 
 
 
