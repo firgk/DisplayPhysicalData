@@ -26,6 +26,13 @@ https://www.bilibili.com/video/BV1rDLdzSEqS/
 
 ### 使用项目
 
+python 3.11.2
+linux
+
+
+python 3.9.20
+linux 会报错，需要自己处理 pip
+
 ```
 创建虚拟环境 test_venv
 cd test_venv
