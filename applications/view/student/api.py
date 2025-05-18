@@ -415,128 +415,46 @@ def error_statistics():
 
 
 
-
-
 @bp.get('/cluster_analysis_result')
 @login_required
 @cache.cached(timeout=900)
 def cluster_analysis_result():
     try:
-        # 获取JSON文件路径
-        json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
-                                    'makedata', 'student_clusters.json')
+        # 读取聚类结果文件
+        with open('makedata/student_clusters.json', 'r', encoding='utf-8') as f:
+            cluster_data = json.load(f)
+            
+        # 提取每个群体的特征数据
+        clusters = cluster_data['clusters']
+        cluster_features = []
         
-        # 读取JSON文件
-        with open(json_file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        # 处理聚类数据
-        cluster_stats = []
-        for cluster in data.get('clusters', []):
-            # 计算该簇的平均成绩
-            features = cluster.get('簇特征', {})
-            
-            # 计算各项成绩的标准化分数（0-100分）
-            scores = [
-                normalize_score(features.get('50米跑平均成绩', 0), 'run50'),
-                normalize_score(features.get('立定跳远平均成绩', 0), 'long_jump'),
-                normalize_score(features.get('坐位体前屈平均成绩', 0), 'sit_forward'),
-                normalize_score(features.get('长跑平均成绩', 0), 'run_long'),
-                normalize_score(features.get('力量项目平均成绩', 0), 'strength')
-            ]
-            
-            # 计算平均分
-            avg_score = sum(scores) / len(scores)
-            
-            # 根据特征确定群体类型
-            cluster_type = determine_cluster_type(features)
-            
-            cluster_stats.append({
-                'name': cluster_type,
-                'value': round(avg_score, 2),
-                'count': cluster.get('学生数量', 0)
+        for cluster in clusters:
+            features = cluster['簇特征']
+            cluster_features.append({
+                'cluster_id': cluster['簇ID'],
+                'student_count': cluster['学生数量'],
+                'features': {
+                    '身高': features['平均身高'],
+                    '体重': features['平均体重'],
+                    '肺活量': features['平均肺活量'],
+                    '50米跑': features['50米跑平均成绩'],
+                    '立定跳远': features['立定跳远平均成绩'],
+                    '坐位体前屈': features['坐位体前屈平均成绩'],
+                    '长跑': features['长跑平均成绩'],
+                    '力量项目': features['力量项目平均成绩']
+                }
             })
-        
+            
         return jsonify({
             'success': True,
-            'data': {
-                'clusterStats': cluster_stats
-            }
+            'data': cluster_features
         })
         
-    except FileNotFoundError:
-        return jsonify({
-            'success': False,
-            'msg': '聚类数据文件不存在'
-        }), 404
-    except json.JSONDecodeError:
-        return jsonify({
-            'success': False,
-            'msg': '聚类数据文件格式错误'
-        }), 500
     except Exception as e:
         return jsonify({
             'success': False,
-            'msg': f'获取聚类数据失败: {str(e)}'
-        }), 500
-# 结合上面
-def normalize_score(value, score_type):
-    """将原始成绩转换为0-100分的标准化分数"""
-    if score_type == 'run50':
-        # 50米跑：成绩越好分数越高，7秒为100分，12秒为60分
-        return max(60, min(100, 100 - (value - 7) * 8))
-    elif score_type == 'long_jump':
-        # 立定跳远：成绩越好分数越高，250cm为100分，180cm为60分
-        return max(60, min(100, 60 + (value - 180) * 0.57))
-    elif score_type == 'sit_forward':
-        # 坐位体前屈：成绩越好分数越高，20cm为100分，5cm为60分
-        return max(60, min(100, 60 + (value - 5) * 2.67))
-    elif score_type == 'run_long':
-        # 长跑：成绩越好分数越高，240秒为100分，360秒为60分
-        return max(60, min(100, 100 - (value - 240) * 0.33))
-    elif score_type == 'strength':
-        # 力量项目：成绩越好分数越高，50个为100分，20个为60分
-        return max(60, min(100, 60 + (value - 20) * 1.33))
-    else:
-        return 60  # 默认及格分
-
-# 结合上面
-def determine_cluster_type(features):
-    """根据群体特征确定群体类型"""
-    # 获取各项指标
-    height = features.get('平均身高', 0)
-    weight = features.get('平均体重', 0)
-    vital_capacity = features.get('平均肺活量', 0)
-    run50 = features.get('50米跑平均成绩', 0)
-    long_jump = features.get('立定跳远平均成绩', 0)
-    sit_forward = features.get('坐位体前屈平均成绩', 0)
-    run_long = features.get('长跑平均成绩', 0)
-    strength = features.get('力量项目平均成绩', 0)
-    
-    # 计算BMI
-    bmi = weight / ((height/100) ** 2) if height > 0 else 0
-    
-    # 根据特征判断群体类型
-    if bmi < 18.5:
-        if vital_capacity > 4500:
-            return "瘦高型-肺活量优"
-        else:
-            return "瘦高型-需加强"
-    elif 18.5 <= bmi <= 24:
-        if run50 < 7 and long_jump > 250:
-            return "标准型-爆发力强"
-        elif run_long < 240 and strength > 50:
-            return "标准型-耐力强"
-        else:
-            return "标准型-均衡发展"
-    else:
-        if run50 > 8 or run_long > 300:
-            return "偏重型-需减重"
-        else:
-            return "偏重型-需加强"
-
-
-
+            'msg': f'获取聚类分析结果失败: {str(e)}'
+        })
 
 
 
@@ -582,8 +500,6 @@ def single_day_test_count_data_statistics():
                 print(f"处理学生 {student.sNumber} 时发生错误: {str(e)}")  # 调试信息
                 continue
         
-        print(f"统计到的日期数量: {len(date_stats)}")  # 调试信息
-        print(f"日期统计结果: {date_stats}")  # 调试信息
         
         # 按日期排序
         sorted_dates = sorted(date_stats.keys())
@@ -606,46 +522,6 @@ def single_day_test_count_data_statistics():
             'msg': f'获取数据失败: {str(e)}'
         })
 
-
-
-
-
-
-
-
-@bp.get('/student_predictions')
-@login_required
-@cache.cached(timeout=900)
-def student_predictions():
-    try:
-        # 获取JSON文件路径
-        json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
-                                    'makedata', 'student_predictions.json')
-        
-        # 读取JSON文件
-        with open(json_file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        return jsonify({
-            'success': True,
-            'data': {
-                'totalStudents': data['总学生数'],
-                'modelScore': data['模型得分'],
-                'featureImportance': data['特征重要性']
-            }
-        })
-        
-    except FileNotFoundError:
-        return jsonify({
-            'success': False,
-            'msg': '学生预测数据文件不存在，请先运行预测分析'
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'msg': f'读取学生预测数据失败: {str(e)}'
-        })
-    
 
 
 

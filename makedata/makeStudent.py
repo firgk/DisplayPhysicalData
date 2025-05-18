@@ -4,13 +4,18 @@ import uuid
 from datetime import datetime
 from faker import Faker
 from calScore import calculate_score
-from calError import calculate_error
 from calScore import calculate_score2
+from calError import calculate_error
 from calKind import student_cluster_analysis
 from calKind import student_cluster_analysis2
 from calKind import student_cluster_analysis3
-from calPrediction import predict_student_performance
-import pickle
+from calPrediction import unreach_analysis
+
+
+
+
+# 初始化Faker
+fake = Faker('zh_CN')
 
 
 
@@ -60,6 +65,7 @@ import pickle
 #
 
 
+
 class Unreach():
     def __init__(self, id, student_id, grade, sSex, sHeight, sWeight, sVitalCapacity,run50, standingLongJump, sittingForward, run800, run1000, oneMinuteSitUps,pullUP):
         self.id = id
@@ -105,8 +111,8 @@ class Student():
     def __repr__(self):
         return f'<Student {self.id}>'
 
-# 初始化Faker
-fake = Faker('zh_CN')
+
+
 
 
 # 学院信息
@@ -140,16 +146,6 @@ colleges = {
 }
 
 
-
-# 生成正态分布数据
-def generate_normal_data(mean, std_dev):
-    if std_dev == 0:
-        return mean
-    while True:
-        # value = round(random.gauss(mean, std_dev), 2)
-        value = round(random.gauss(mean, mean*0.2), 2) # 保留两位小数
-        if value > 0:
-            return value
 
 
 # 生成学生数据
@@ -214,19 +210,15 @@ def generate_data(num,starter):
 
 
 
-# 生成1000条数据
-
-# num = 20
-# datas = generate_data(num,0)
-#
-# students=[]
-# for student in datas:
-#     student = calculate_score(student)
-#     student = calculate_error(student,datas)  # 传入所有学生数据
-#     students.append(student)
-
-
-
+# 生成正态分布数据
+def generate_normal_data(mean, std_dev):
+    if std_dev == 0:
+        return mean
+    while True:
+        # value = round(random.gauss(mean, std_dev), 2)
+        value = round(random.gauss(mean, mean*0.2), 2) # 保留两位小数
+        if value > 0:
+            return value
 
 
 
@@ -235,12 +227,12 @@ def generate_data(num,starter):
 # 生成 30000 条数据
 
 students = []
-batch_size = 1000
-num_batches = 31
-starter = 0
+batch_size = 87
+num_batches = 300
+starter = 100
 for i in range(num_batches):
     datas = generate_data(batch_size,starter)
-    starter+=1000
+    starter+=batch_size
     for student in datas:
         student = calculate_score(student)
         student = calculate_error(student, datas)  # 传入所有学生数据
@@ -249,35 +241,19 @@ for i in range(num_batches):
 
 
 
+
+# 调试用
 # 以二进制持久化 score_data 数据
-with open('students31.bin', 'wb') as file:
-    pickle.dump(students, file)
+# with open('students31.bin', 'wb') as file:
+#     pickle.dump(students, file)
 
 
+
+# 调试用
 # 读取 score_data 数据
 # with open('students30.bin', 'rb') as file:
 #     students = pickle.load(file)
 
-print("\n正在复制聚类分析文件...")
-import shutil
-# 拷贝文件student_clusters30.json 到 student_clusters.json
-# shutil.copy2('student_clusters30.json', 'student_clusters.json')
-# shutil.copy2('student_clusters301.json', 'student_clusters1.json')
-# shutil.copy2('student_clusters302.json', 'student_clusters2.json')
-print("文件复制完成")
-
-
-print("\n正在聚类分析...")
-student_cluster_analysis(students,'student_clusters31.json')
-student_cluster_analysis2(students,'student_clusters131.json')
-student_cluster_analysis3(students,'student_clusters231.json')
-print("聚类分析完成")
-
-import shutil
-# 拷贝文件student_clusters30.json 到 student_clusters.json
-shutil.copy2('student_clusters31.json', 'student_clusters.json')
-shutil.copy2('student_clusters131.json', 'student_clusters1.json')
-shutil.copy2('student_clusters231.json', 'student_clusters2.json')
 
 
 
@@ -343,10 +319,6 @@ for student in students:
     
 
 
-
-
-
-
 unreach_student_output = "unreach_datas = ["
 total = len(unreach_students)
 for i, data in enumerate(unreach_students, 1):
@@ -381,9 +353,7 @@ for i, data in enumerate(unreach_students, 1):
     ),"""
 output = unreach_student_output.rstrip(',') + "\n]"
 
-# print(output)
-
-with open('../applications/common/script/unreach.py', 'w', encoding='utf-8') as file:
+with open('applications/common/script/unreach.py', 'w', encoding='utf-8') as file:
     file.write('from applications.models.unreach import Unreach\n')
     file.write('\n')
     file.write(output)
@@ -399,10 +369,26 @@ with open('../applications/common/script/unreach.py', 'w', encoding='utf-8') as 
 
 
 
+print("\n正在预测分析...")
+print("预测分析完成")
 
 
-print("\n正在格式化输出数据...")
-# 格式化输出数据
+
+
+print("\n正在聚类分析...")
+student_cluster_analysis(students,'makedata/student_clusters.json')
+student_cluster_analysis2(students,'makedata/student_clusters1.json')
+student_cluster_analysis3(students,'makedata/student_clusters2.json')
+print("聚类分析完成")
+
+
+
+print("\n正在预测分析...")
+unreach_analysis(students,unreach_students)
+print("预测分析完成\n")
+
+
+
 output = "datas = ["
 total = len(students)
 for i, data in enumerate(students, 1):
@@ -449,17 +435,14 @@ for i, data in enumerate(students, 1):
     ),"""
 output = output.rstrip(',') + "\n]"
 
-# print(output)
 
-with open('../applications/common/script/student.py', 'w', encoding='utf-8') as file:
+
+with open('applications/common/script/student.py', 'w', encoding='utf-8') as file:
     file.write('from applications.models import Student\n')
     file.write('import datetime\n')
     file.write('now_time = datetime.datetime.now()\n')
     file.write('\n')
     file.write(output)
-
-
-
 
 
 

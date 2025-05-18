@@ -42,13 +42,13 @@ def login_post():
     if not all([code, s_code]):
         return fail_api(msg="参数错误")
 
-    # if code != s_code:
-    #     return fail_api(msg="验证码错误")
+    # TODO 解除验证码跳过
+
+    if code != s_code:
+        return fail_api(msg="验证码错误")
     user = User.query.filter_by(username=username).first()
     person = Student.query.filter_by(sNumber=username).first()
 
-    print(user)
-    print(person)
 
     if not user and not person:
         return fail_api(msg="不存在的用户")
@@ -101,6 +101,7 @@ def login_post():
             return success_api(msg="登录成功")
 
         return fail_api(msg="用户名或密码错误")
+
 
 
 # 退出登录

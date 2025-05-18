@@ -5,6 +5,11 @@ from sklearn.mixture import GaussianMixture
 import json
 
 
+
+# 三个聚分析和生成的数据
+
+
+
 # KMeans 算法
 def student_cluster_analysis(students, output_file="student_clusters.json"):
     # 准备数据

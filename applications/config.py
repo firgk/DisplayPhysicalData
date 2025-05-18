@@ -5,6 +5,13 @@ import os
 # 在 BaseConfig 类定义前加载
 basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
+
+# __file__ 变量表示当前脚本的文件名，os.path.dirname(__file__) 返回该文件的目录路径。
+# os.path.dirname(os.path.dirname(__file__)) 表示取该目录路径的父目录。
+# os.path.abspath() 函数返回规范化的绝对路径名，确保路径没有符号链接和'/./'之类的东西。
+# 因此，basedir 最终存储的是当前文件的父目录的绝对路径。
+
+
 class BaseConfig:
     # 超级管理员账号
     SUPERADMIN = 'admin'
@@ -65,6 +72,7 @@ class BaseConfig:
 
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'pear.db')
     # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:123456@127.0.0.1:3305/pear?charset=utf8'
+
 
     # SQLALCHEMY_DATABASE_URI="mysql+pymysql://root:123456@127.0.0.1:3305/pear"
     # SQLALCHEMY_TRACK_MODIFICATIONS = False

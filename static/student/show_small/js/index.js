@@ -204,117 +204,158 @@
 
 
 
+
 // 柱状图2
 //不同群体体测平均成绩
 // 12
 (function () {
   var myChart = echarts.init(document.querySelector(".bar2 .chart"));
   
+  // 定义图表配置
   var option = {
-    color: ['#2f89cf'],
     tooltip: {
       trigger: 'axis',
-      formatter: '{b}<br/>平均成绩: {c}分<br/>'
+      axisPointer: {
+        type: 'shadow'
+      }
+    },
+    color: ['#1089E7', '#F57474', '#56D0E3', '#F8B448', '#8B78F6', '#00f2f1', '#ed3f35', '#FFA500'],
+    legend: {
+      data: ['身高(cm)', '体重(kg)', '肺活量(ml)', '50米跑(s)', '立定跳远(cm)', '坐位体前屈(cm)', '长跑(s)', '力量项目(个)'],
+      type: 'scroll',
+      bottom: 0,
+      textStyle: {
+        color: '#ffffff'
+      }
     },
     grid: {
-      left: '0%',
-      top: '10px',
-      right: '0%',
-      bottom: '4%',
+      left: '3%',
+      right: '4%',
+      bottom: '15%',
+      top: '15%',
       containLabel: true
     },
-    xAxis: [{
+    xAxis: {
       type: 'category',
-      data: [],
+      data: ['群体1', '群体2', '群体3', '群体4'],
       axisLabel: {
-        color: "rgba(255,255,255,0.8)",
-        fontSize: 10,
-        interval: 0,
-        rotate: 0
-      },
-      axisLine: { show: false }
-    }],
-    yAxis: [{
+        color: '#ffffff'
+      }
+    },
+    yAxis: {
       type: 'value',
-      name: '平均成绩',
-      min: 0,
-      max: 100,
-      interval: 20,
-      nameTextStyle: {
-        color: "rgba(255,255,255,0.8)",
-        fontSize: 12
-      },
+      name: '数值',
       axisLabel: {
-        color: "rgba(255,255,255,0.6)",
-        fontSize: 12,
-        formatter: '{value}分'
+        color: '#ffffff'
+      }
+    },
+    series: [
+      {
+        name: '身高(cm)',
+        type: 'bar',
+        data: []
       },
-      splitLine: {
-        lineStyle: { color: "rgba(255,255,255,0.1)" }
+      {
+        name: '体重(kg)',
+        type: 'bar',
+        data: []
+      },
+      {
+        name: '肺活量(ml)',
+        type: 'bar',
+        data: []
+      },
+      {
+        name: '50米跑(s)',
+        type: 'bar',
+        data: []
+      },
+      {
+        name: '立定跳远(cm)',
+        type: 'bar',
+        data: []
+      },
+      {
+        name: '坐位体前屈(cm)',
+        type: 'bar',
+        data: []
+      },
+      {
+        name: '长跑(s)',
+        type: 'bar',
+        data: []
+      },
+      {
+        name: '力量项目(个)',
+        type: 'bar',
+        data: []
       }
-    }],
-    series: [{
-      name: '平均成绩',
-      type: 'bar',
-      barWidth: '35%',
-      data: [],
-      itemStyle: { 
-        barBorderRadius: 5,
-        color: function(params) {
-          // 根据分数设置不同的颜色
-          var value = params.value;
-          if (value >= 90) return '#67C23A';  // 优秀
-          if (value >= 80) return '#409EFF';  // 良好
-          if (value >= 70) return '#E6A23C';  // 中等
-          if (value >= 60) return '#F56C6C';  // 及格
-          return '#909399';  // 不及格
-        }
-      }
-    }]
+    ]
   };
 
-  function loadData() {
-    $.ajax({
-      url: '/api/cluster_analysis_result',
-      type: 'GET',
-      success: function(res) {
-        if (res && res.success && res.data && Array.isArray(res.data.clusterStats)) {
-          var clusterStats = res.data.clusterStats;
-          option.xAxis[0].data = clusterStats.map(item => item.name);
-          option.series[0].data = clusterStats.map(item => ({
-            value: item.value || 0,
-            count: item.count || 0
-          }));
-          myChart.setOption(option);
+  // 设置图表配置
+  myChart.setOption(option);
+
+  // 获取数据并更新图表
+  function fetchAndUpdateData() {
+    fetch('/api/cluster_analysis_result')
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          const data = result.data;
+          
+          // 准备数据
+          const seriesData = {
+            '身高(cm)': [],
+            '体重(kg)': [],
+            '肺活量(ml)': [],
+            '50米跑(s)': [],
+            '立定跳远(cm)': [],
+            '坐位体前屈(cm)': [],
+            '长跑(s)': [],
+            '力量项目(个)': []
+          };
+          
+          // 处理数据
+          data.forEach(cluster => {
+            const features = cluster.features;
+            seriesData['身高(cm)'].push(features['身高'].toFixed(2));
+            seriesData['体重(kg)'].push(features['体重'].toFixed(2));
+            seriesData['肺活量(ml)'].push(features['肺活量'].toFixed(2));
+            seriesData['50米跑(s)'].push(features['50米跑'].toFixed(2));
+            seriesData['立定跳远(cm)'].push(features['立定跳远'].toFixed(2));
+            seriesData['坐位体前屈(cm)'].push(features['坐位体前屈'].toFixed(2));
+            seriesData['长跑(s)'].push(features['长跑'].toFixed(2));
+            seriesData['力量项目(个)'].push(features['力量项目'].toFixed(2));
+          });
+          
+          // 更新图表数据
+          const newOption = {
+            series: Object.keys(seriesData).map(key => ({
+              name: key,
+              type: 'bar',
+              data: seriesData[key]
+            }))
+          };
+          
+          myChart.setOption(newOption);
         } else {
-          showError('数据加载失败', res ? res.msg : '未知错误');
+          console.error('获取数据失败:', result.msg);
         }
-      },
-      error: function() {
-        showError('数据加载失败', '请检查网络连接');
-      }
-    });
+      })
+      .catch(error => {
+        console.error('请求失败:', error);
+      });
   }
 
-  function showError(title, subtext) {
-    myChart.setOption({
-      title: {
-        text: title,
-        subtext: subtext,
-        left: 'center',
-        top: 'center',
-        textStyle: { color: '#fff' }
-      }
-    });
-  }
+  // 初始加载数据
+  fetchAndUpdateData();
 
-  loadData();
-  window.addEventListener('resize', () => myChart.resize());
-  setInterval(loadData, 5 * 60 * 1000);
+  // 监听窗口大小变化，调整图表大小
+  window.addEventListener('resize', function() {
+    myChart.resize();
+  });
 })();
-
-
-
 
 
 

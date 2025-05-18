@@ -5,12 +5,22 @@
   <title>用户管理</title>
   {% include 'system/common/header.html' %}
 </head>
-
+<!-- 体测管理-成绩录入界面 -->
 <body>
   <form class="layui-form">
     <div class="mainBox">
       <div class="main-container">
         <div class="main-container">
+
+
+          <div class="layui-form-item">
+            <label class="layui-form-label">补测</label>
+            <div class="layui-input-block">
+              <input type="radio" name="sCount" value="1" title="是">
+              <input type="radio" name="sCount" value="0" title="否" checked>
+            </div>
+          </div>
+
           <div class="layui-form-item">
             <label class="layui-form-label">账号</label>
             <div class="layui-input-block">

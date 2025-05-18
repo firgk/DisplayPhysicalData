@@ -214,7 +214,13 @@
                                 <tbody>
                                     {% for item in prediction_info.time_series.项目预测 %}
                                     <tr>
-                                        <td>{{ item.项目名称 }}</td>
+                                        <td>{% if item.项目名称 == 'sHeight' %}身高(cm)
+                                            {% elif item.项目名称 == 'sWeight' %}体重(kg)
+                                            {% elif item.项目名称 == 'sVitalCapacity' %}肺活量(ml)
+                                            {% elif item.项目名称 == 'run50' %}50米跑(s)
+                                            {% elif item.项目名称 == 'standingLongJump' %}立定跳远(cm)
+                                            {% elif item.项目名称 == 'sittingForward' %}坐位体前屈(cm)
+                                            {% else %}{{ item.项目名称 }}{% endif %}</td>
                                         <td>{{ item.第一次成绩 }}</td>
                                         <td>{{ item.第二次成绩 }}</td>
                                         <td>{{ item.变化趋势 }}</td>
@@ -252,7 +258,17 @@
                                 <tbody>
                                     {% for item in prediction_info.regression.体能评估 %}
                                     <tr>
-                                        <td>{{ item.项目 }}</td>
+                                        <td>{% if item.项目 == 'sHeight' %}身高(cm)
+                                            {% elif item.项目 == 'sWeight' %}体重(kg)
+                                            {% elif item.项目 == 'sVitalCapacity' %}肺活量(ml)
+                                            {% elif item.项目 == 'run50' %}50米跑(s)
+                                            {% elif item.项目 == 'standingLongJump' %}立定跳远(cm)
+                                            {% elif item.项目 == 'sittingForward' %}坐位体前屈(cm)
+                                            {% elif item.项目 == 'run800' %}800米跑(s)
+                                            {% elif item.项目 == 'run1000' %}1000米跑(s)
+                                            {% elif item.项目 == 'oneMinuteSitUps' %}仰卧起坐(个)
+                                            {% elif item.项目 == 'pullUP' %}引体向上(个)
+                                            {% else %}{{ item.项目 }}{% endif %}</td>
                                         <td>{{ item.首次成绩 }}</td>
                                         <td>{{ item.补测成绩 }}</td>
                                         <td>{{ item.改进率 }}</td>

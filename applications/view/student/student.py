@@ -9,7 +9,7 @@ from applications.common.utils.rights import authorize
 from applications.common.utils.validate import str_escape
 from applications.extensions import db
 from applications.models import Role, College
-from applications.models import User, AdminLog, Student
+from applications.models import User, AdminLog, Student,Unreach
 from flask_caching import Cache
 
 bp = Blueprint('student', __name__, url_prefix='/student')
@@ -159,10 +159,15 @@ def dataSave():
     oneMinuteSitUps = str_escape(req_json.get('oneMinuteSitUps'))
     pullUP = str_escape(req_json.get('pullUP'))
 
+    sCount = str_escape(req_json.get('sCount'))
+
+
+
 
     if not sNumber or not sName:
         print(sNumber, sName)
         return fail_api(msg="学生姓名或学号不能为空")
+
 
 
     filters = []
@@ -171,8 +176,8 @@ def dataSave():
 
     student = Student.query.filter(*filters).first()
 
-    if not student:
-        return fail_api(msg="学生不存在")
+    # if not student:
+    #     return fail_api(msg="学生不存在")
 
     update_data = {}
     if sHeight:
@@ -196,7 +201,40 @@ def dataSave():
     if pullUP:
         update_data['pullUP'] = pullUP
 
-    Student.query.filter_by(sName=sName, sNumber=sNumber).update(update_data)
+
+
+
+
+    update_data2 = {}
+    if sHeight:
+        update_data2['sHeight'] = sHeight
+    if sWeight:
+        update_data2['sWeight'] = sWeight
+    if sVitalCapacity:
+        update_data2['sVitalCapacity'] = sVitalCapacity
+    if run50:
+        update_data2['run50'] = run50
+    if standingLongJump:
+        update_data2['standingLongJump'] = standingLongJump
+    if sittingForward:
+        update_data2['sittingForward'] = sittingForward
+    if run800:
+        update_data2['run800'] = run800
+    if run1000:
+        update_data2['run1000'] = run1000
+    if oneMinuteSitUps:
+        update_data2['oneMinuteSitUps'] = oneMinuteSitUps
+    if pullUP:
+        update_data2['pullUP'] = pullUP
+
+    result=0
+    print(student.id)
+    if sCount=='1':
+        print('补测成绩添加和更新')
+        result=Unreach.query.filter_by(student_id=student.id).update(update_data2)
+    else:
+        print('首次成绩添加和更新')
+        result=Student.query.filter_by(sName=sName, sNumber=sNumber).update(update_data)
 
     # result = Student.query.filter_by(sName=sName, sNumber=sNumber).update(update_data)
     # if result == 0:
@@ -204,11 +242,11 @@ def dataSave():
     # else:
     #     print(f"调试信息: 更新成功，更新了 {result} 条记录")
 
-
-    db.session.commit()
-    return success_api(msg="添加成功")
-
-
+    if result == 0:
+        return fail_api(msg="更新失败，未找到匹配的学生记录")
+    else:
+        db.session.commit()
+        return success_api(msg="添加成功")
 
 
 #  编辑用户
@@ -229,6 +267,24 @@ def dataEdit(id):
 @bp.get('/show_small/')
 @authorize("student:show_small")
 def show_small():
+
+    
+    print("触发启动更新学生成绩")
+
+    filters = []
+    filters.append(Student.id.in_([1001,1002,1003,1004,1005,1006,1007,1008,1009,1010]))
+    students = Student.query.filter(*filters).all()
+    # 批量更新学生记录
+
+    update_data = {}
+    update_data['sHeight'] = 'None'
+    for student in students:
+        Student.query.filter_by(id=student.id).update(update_data)
+
+    # 提交事务
+    db.session.commit()
+    print(f"成功更新 {len(students)} 条学生记录")
+
     return render_template('student/analysis.html')
 
 
@@ -417,8 +473,11 @@ def infoSave():
 @bp.get('/show/')
 @authorize("student:show")
 def show():
+    
+    print("触发启动更新学生成绩")
+
     filters = []
-    filters.append(Student.id.in_([101,102,103,104,105,106,107,108,109,110]))
+    filters.append(Student.id.in_([1001,1002,1003,1004,1005,1006,1007,1008,1009,1010]))
     students = Student.query.filter(*filters).all()
     # 批量更新学生记录
 
@@ -430,6 +489,7 @@ def show():
     # 提交事务
     db.session.commit()
     print(f"成功更新 {len(students)} 条学生记录")
+
     return render_template('student/show/index.html')
 
 

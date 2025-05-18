@@ -5,6 +5,7 @@ import json
 import os
 from datetime import datetime
 from flask_caching import Cache
+from flask import current_app
 
 from applications.common import curd
 from applications.common.curd import enable_status, disable_status
@@ -19,6 +20,23 @@ bp = Blueprint('front', __name__, url_prefix='/front')
 
 # 初始化缓存
 cache = Cache()
+
+
+
+
+
+
+
+
+# 读取聚类数据
+
+# 读取预测分析数据
+
+
+
+
+
+
 
 # 此处修改需要和 /system/index 下同步
 # 此处不需要更改
@@ -399,50 +417,53 @@ def cluster_analysis2():
 
 
 
+
+
+
+
+# 时间序列分析 (单项预测)
+# 回归分析 (综合评估)
+
+
+
+# 预测分析
 @bp.get('/unreach-analysis')
 @login_required
 @cache.cached(timeout=900)
 def unreach_analysis():
     try:
-        # 获取所有学生及其补测数据
-        students = Student.query.all()
-        unreach_students = []
+        print('开始读取预测分析数据...')
         
-        # 收集需要补测的学生及其数据
-        for student in students:
-            if student.unreach == '1':
-                unreach_student = Unreach.query.filter_by(student_id=student.id).first()
-                if unreach_student:
-                    unreach_students.append((student, unreach_student))
-        
-        if not unreach_students:
-            return fail_api(msg="没有找到需要补测的学生数据")
-        
-        # 分析数据并生成预测
-        prediction_results = perform_time_series_analysis(unreach_students)
-        regression_results = perform_regression_analysis(unreach_students)
-        
-        # 将结果保存为JSON文件
-        analysis_results = {
-            "success": True,
-            "msg": "成绩预测分析完成",
-            "时间序列分析": prediction_results,
-            "回归分析": regression_results,
-            "总体评估": generate_overall_assessment(prediction_results, regression_results)
-        }
-        
-        json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
-                                      'makedata', 'unreach_analysis.json')
-        with open(json_file_path, 'w', encoding='utf-8') as f:
-            json.dump(analysis_results, f, ensure_ascii=False, indent=4)
-        
+        # json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
+        #                               'makedata', 'unreach_analysis.json')
+
+        json_file_path = os.path.join(current_app.root_path, 'makedata', 'unreach_analysis.json')
+
+        # 检查文件是否存在
+        if not os.path.exists(json_file_path):
+            return fail_api(msg="预测分析数据文件不存在")
+
+        # 从 JSON 文件读取数据
+        with open(json_file_path, 'r', encoding='utf-8') as f:
+            analysis_results = json.load(f)
+
+        print('预测分析数据加载成功')
+
+        # 返回成功的 API 响应
         return table_api(
-            msg="成绩预测分析完成",
-            data=analysis_results,
-            count=len(unreach_students)
+            msg="成绩预测分析数据加载成功",
+            data=analysis_results
         )
+    
+
+    except json.JSONDecodeError:
+        return fail_api(msg="JSON 文件解析失败，请检查文件格式")
     except Exception as e:
-        return fail_api(msg=f"成绩预测分析失败: {str(e)}")
+        return fail_api(msg=f"读取预测分析数据时发生错误: {str(e)}")
+
+
+# 预测分析附加函数
+# 时间序列分析
 
 def perform_time_series_analysis(unreach_students):
     """
@@ -466,10 +487,10 @@ def perform_time_series_analysis(unreach_students):
         
         for feature in physical_features:
             # 检查该项目是否适用于当前学生性别
-            if (feature == 'run800' and student.sSex == '男') or \
-               (feature == 'run1000' and student.sSex == '女') or \
-               (feature == 'oneMinuteSitUps' and student.sSex == '男') or \
-               (feature == 'pullUP' and student.sSex == '女'):
+            if (feature == 'run1000' and student.sSex == '男') or \
+               (feature == 'run800' and student.sSex == '女') or \
+               (feature == 'pullUP' and student.sSex == '男') or \
+               (feature == 'oneMinuteSitUps' and student.sSex == '女'):
                 continue
             
             # 获取第一次和第二次的成绩
@@ -477,7 +498,8 @@ def perform_time_series_analysis(unreach_students):
             second_score = getattr(unreach_student, feature, None)
             
             # 如果有效的成绩数据，计算预测值
-            if first_score and second_score and first_score != 'None' and second_score != 'None':
+            if first_score not in [None, '', 'None'] and second_score not in [None, '', 'None']:
+            # if first_score and second_score and first_score != 'None' and second_score != 'None':
                 try:
                     first_value = float(first_score)
                     second_value = float(second_score)
@@ -527,6 +549,10 @@ def perform_time_series_analysis(unreach_students):
 
 
 
+
+# 预测分析附加函数
+# 回归分析
+
 def perform_regression_analysis(unreach_students):
     """
     使用回归分析预测学生未来成绩
@@ -547,6 +573,10 @@ def perform_regression_analysis(unreach_students):
     
     return regression_results
 
+
+
+
+# 预测分析附加函数
 def analyze_by_gender(gender_students, gender):
     """
     针对特定性别的学生进行回归分析
@@ -643,7 +673,12 @@ def analyze_by_gender(gender_students, gender):
     
     return results
 
-def generate_overall_assessment(time_series_results, regression_results):
+
+# 预测分析附加函数
+
+# 总体评估函数
+
+def generate_overall_assessment(time_series_results):
     """
     基于时间序列分析和回归分析生成总体评估报告
     """
@@ -719,6 +754,9 @@ def generate_overall_assessment(time_series_results, regression_results):
                 assessment["建议措施"].append("力量项目需要加强，建议增加针对性的力量训练")
     
     return assessment
+
+
+# 预测分析附加函数
 
 def find_weak_projects(time_series_results):
     """

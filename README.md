@@ -40,16 +40,12 @@ pip install -r requirements.txt
 
 
 启动项目
-flask --app app.py run -h 0.0.0.0 -p 8000 --debug
-or
-flask --app app.py run -h 0.0.0.0 -p 8000
-or
-python app.py
+./run
+
+
 
 登录界面
 http://127.0.0.1:8000/
-
-
 
 ```
 
@@ -69,77 +65,87 @@ show
 
 不及格之后补测的
 
-4917031304
-6757807427
+9764397200
+6092287451
 
 
 没有补测的
 
-7003341534
-5717270489
+8683340123 曹冬梅
+9037491254 王倩
 
 
 ```
 
 
-## 存在的问题
+
+
+## 注意
 
 ```
-登录 http://127.0.0.1:8000/student/show/ 接口 自动删除100 101 ... 109 的成绩，使展示的数据更加好看
+1
+登录 http://127.0.0.1:8000/student/show/ 接口 自动删除1001 1002 ... 1009 的成绩，使展示的数据更加好看
+启动后首次加载才可以，否则就会由缓存处理，不再执行删除操作
 
-登录 student id 为 前 10 的会报错，原因参考 def init_login_manager(app):
-```
+2
+def init_login_manager(app):
 
-
-
-
-
-
+passport.py 登录
 
 
-## 二次开发需要注意
-
+3
 需要熟练掌握 Pear Admin Flask， 否则无法进行开发
 
+
+4
+修改权限管理之后重新登陆生效
+
+
+5
+view/system/rights.py 可以修改部分设置
+config.py 可以修改部分设置
+
+
+6
+管理员用户最多为100个，不可以多
+
+
+
+
+
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 其他
+
+```
 sqlalchemy.exc.IntegrityError: (pymysql.err.IntegrityError) (1062, "Duplicate entry '1' for key 'PRIMARY'")
 mysql 主键不可以设置为0
 
-
-修改权限管理之后重新登陆生效
 
 @bp.get('/show/')
 show 后要加 / 否则会报错
 
 循环引用导致出错
-
-view/system/rights.py 可以修改部分设置
-
-
-
-init_login
-
-from flask_login import LoginManager
-
-
-def init_login_manager(app):
-    login_manager = LoginManager()
-    login_manager.init_app(app)
-
-    login_manager.login_view = 'system.passport.login'
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        from applications.models import User, Student
-        # 首先尝试从User表中查找
-        user = User.query.get(int(user_id))
-        if user:
-            return user
-        # 如果User表中没有找到，尝试从Student表中查找
-        student = Student.query.get(int(user_id))
-        return student
 ```
+
+
+
+
+
+
 
 
 

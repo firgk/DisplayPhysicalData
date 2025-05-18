@@ -47,3 +47,4 @@ pandas==2.2.3
 matplotlib==3.10.1
 flask-caching==2.3.1
 scikit-learn==1.6.1
+Faker==37.3.0
