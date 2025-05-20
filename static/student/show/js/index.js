@@ -613,7 +613,7 @@
 (function () {
   // 定义一个异步函数来获取数据
   $.ajax({
-    url: 'http://127.0.0.1:8000/api/distribution_of_actual_test_scores', // 替换为你的数据接口
+    url: '/api/distribution_of_actual_test_scores', // 替换为你的数据接口
     type: 'GET', // 请求类型
     dataType: 'json', // 期望的返回数据类型
     success: function (data) {
