@@ -293,6 +293,15 @@
             <option value="hierarchical">层次聚类</option>
             <option value="dbscan">高斯混合模型</option>
         </select>
+        <label for="collegeCode">选择学院：</label>
+        <select id="collegeCode">
+            <option value="999" selected>全部学院</option> <!-- 默认选项 -->
+            {% for college in colleges %}
+            <option value="{{ college.collegeCode }}" title="{{ college.className }}">
+                {{ college.className }}
+            </option>
+            {% endfor %}
+        </select>
         <button id="runAnalysis" class="btn btn-primary">选择</button>
         
         <button id="generateReport" class="btn btn-primary" style="float: right; margin-right: 200px;">报告生成</button>
@@ -397,16 +406,19 @@
             const runAnalysisBtn = document.getElementById('runAnalysis');
             const algorithmSelect = document.getElementById('clusterAlgorithm');
             const generateReportBtn = document.getElementById('generateReport');
+            const collegeCode = document.getElementById('collegeCode');
+
 
             // 初始加载默认算法数据
-            loadClusterData('kmeans');
+            loadClusterData('kmeans',999);
             // 加载未达标学生分析数据
             loadUnreachAnalysisData();
 
             // 添加按钮点击事件
             runAnalysisBtn.addEventListener('click', function() {
                 const selectedAlgorithm = algorithmSelect.value;
-                loadClusterData(selectedAlgorithm);
+                const selectedCollegeCode = collegeCode.value;
+                loadClusterData(selectedAlgorithm,selectedCollegeCode); // 默认加载全部学院数据
             });
 
             
@@ -491,7 +503,7 @@
 
 
 
-            function loadClusterData(algorithm) {
+            function loadClusterData(algorithm,college) {
                 loading.style.display = 'block';
                 let apiEndpoint = '/front/cluster-analysis';
                 
@@ -506,8 +518,9 @@
                     default:
                         apiEndpoint = '/front/cluster-analysis';
                 }
+                const urlWithParams = `${apiEndpoint}?college=${college}`;
 
-                fetch(apiEndpoint)
+                fetch(urlWithParams)
                     .then(response => response.json())
                     .then(data => {
                         if (data.code === 0) {
@@ -643,10 +656,10 @@
 
         function renderClusters(clusters) {
             const clusterSection = document.getElementById('clusterSection');
+            // <h3 class="cluster-title">${cluster.cluster_description}</h3>
             clusterSection.innerHTML = clusters.map(cluster => `
                 <div class="cluster-card">
                     <div class="cluster-header">
-                        <h3 class="cluster-title">${cluster.cluster_description}</h3>
                         <span>学生数量：${cluster.student_count}</span>
                     </div>
                     <div class="cluster-stats">

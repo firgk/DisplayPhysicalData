@@ -44,8 +44,9 @@ def login_post():
 
     # TODO 解除验证码跳过
 
-    if code != s_code:
-        return fail_api(msg="验证码错误")
+    # if code != s_code:
+    #     return fail_api(msg="验证码错误")
+    
     user = User.query.filter_by(username=username).first()
     person = Student.query.filter_by(sNumber=username).first()
 

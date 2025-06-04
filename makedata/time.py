@@ -3,9 +3,6 @@ from threading import Timer
 import os
 import time
 
-'''
-每个 10 秒打印当前时间。
-'''
 
 def timedTask():
     '''
@@ -19,8 +16,7 @@ def timedTask():
 def task():
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("定时任务执行")
-    os.system("python makeStudent.py")
-
+    os.system("python makeStudent_test.py")
 
 
 
@@ -37,8 +33,10 @@ if __name__ == '__main__':
         if current_time.hour == 2 and current_time.minute == 0 and current_time.second == 0:
             task()
         # 每隔5秒打印一次当前时间戳
-        print(time.time())
-        time.sleep(5)
+        # print(f"{current_time.hour}:{current_time.minute}:{current_time.second}")
+        # 执行cmd命令
+        # 等待2秒钟
+        time.sleep(2)
 
 
 

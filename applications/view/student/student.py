@@ -144,110 +144,115 @@ def dataAdd():
 # @authorize("student:add")
 def dataSave():
 
-    req_json = request.get_json(force=True)
+        req_json = request.get_json(force=True)
 
-    sNumber = str_escape(req_json.get('sNumber'))
-    sName = str_escape(req_json.get('sName'))
-    sHeight = str_escape(req_json.get('sHeight'))
-    sWeight = str_escape(req_json.get('sWeight'))
-    sVitalCapacity = str_escape(req_json.get('sVitalCapacity'))
-    run50 = str_escape(req_json.get('run50'))
-    standingLongJump = str_escape(req_json.get('standingLongJump'))
-    sittingForward = str_escape(req_json.get('sittingForward'))
-    run800 = str_escape(req_json.get('run800'))
-    run1000 = str_escape(req_json.get('run1000'))
-    oneMinuteSitUps = str_escape(req_json.get('oneMinuteSitUps'))
-    pullUP = str_escape(req_json.get('pullUP'))
+        sNumber = str_escape(req_json.get('sNumber'))
+        sName = str_escape(req_json.get('sName'))
+        sHeight = str_escape(req_json.get('sHeight'))
+        sWeight = str_escape(req_json.get('sWeight'))
+        sVitalCapacity = str_escape(req_json.get('sVitalCapacity'))
+        run50 = str_escape(req_json.get('run50'))
+        standingLongJump = str_escape(req_json.get('standingLongJump'))
+        sittingForward = str_escape(req_json.get('sittingForward'))
+        run800 = str_escape(req_json.get('run800'))
+        run1000 = str_escape(req_json.get('run1000'))
+        oneMinuteSitUps = str_escape(req_json.get('oneMinuteSitUps'))
+        pullUP = str_escape(req_json.get('pullUP'))
 
-    sCount = str_escape(req_json.get('sCount'))
-
-
-
-
-    if not sNumber or not sName:
-        print(sNumber, sName)
-        return fail_api(msg="学生姓名或学号不能为空")
-
-
-
-    filters = []
-    filters.append(Student.sName.contains(sName))
-    filters.append(Student.sNumber.contains(sNumber))
-
-    student = Student.query.filter(*filters).first()
-
-    # if not student:
-    #     return fail_api(msg="学生不存在")
-
-    update_data = {}
-    if sHeight:
-        update_data['sHeight'] = sHeight
-    if sWeight:
-        update_data['sWeight'] = sWeight
-    if sVitalCapacity:
-        update_data['sVitalCapacity'] = sVitalCapacity
-    if run50:
-        update_data['run50'] = run50
-    if standingLongJump:
-        update_data['standingLongJump'] = standingLongJump
-    if sittingForward:
-        update_data['sittingForward'] = sittingForward
-    if run800:
-        update_data['run800'] = run800
-    if run1000:
-        update_data['run1000'] = run1000
-    if oneMinuteSitUps:
-        update_data['oneMinuteSitUps'] = oneMinuteSitUps
-    if pullUP:
-        update_data['pullUP'] = pullUP
+        sCount = str_escape(req_json.get('sCount'))
 
 
 
 
+        if not sNumber or not sName:
+            print(sNumber, sName)
+            return fail_api(msg="学生姓名或学号不能为空")
 
-    update_data2 = {}
-    if sHeight:
-        update_data2['sHeight'] = sHeight
-    if sWeight:
-        update_data2['sWeight'] = sWeight
-    if sVitalCapacity:
-        update_data2['sVitalCapacity'] = sVitalCapacity
-    if run50:
-        update_data2['run50'] = run50
-    if standingLongJump:
-        update_data2['standingLongJump'] = standingLongJump
-    if sittingForward:
-        update_data2['sittingForward'] = sittingForward
-    if run800:
-        update_data2['run800'] = run800
-    if run1000:
-        update_data2['run1000'] = run1000
-    if oneMinuteSitUps:
-        update_data2['oneMinuteSitUps'] = oneMinuteSitUps
-    if pullUP:
-        update_data2['pullUP'] = pullUP
 
-    result=0
-    print(student.id)
-    if sCount=='1':
-        print('补测成绩添加和更新')
-        result=Unreach.query.filter_by(student_id=student.id).update(update_data2)
-    else:
-        print('首次成绩添加和更新')
-        result=Student.query.filter_by(sName=sName, sNumber=sNumber).update(update_data)
 
-    # result = Student.query.filter_by(sName=sName, sNumber=sNumber).update(update_data)
-    # if result == 0:
-    #     print(f"调试信息: 更新失败，未找到匹配的学生记录，sName: {sName}, sNumber: {sNumber}")
-    # else:
-    #     print(f"调试信息: 更新成功，更新了 {result} 条记录")
+        filters = []
+        filters.append(Student.sName.contains(sName))
+        filters.append(Student.sNumber.contains(sNumber))
 
-    if result == 0:
-        return fail_api(msg="更新失败，未找到匹配的学生记录")
-    else:
-        db.session.commit()
-        return success_api(msg="添加成功")
+        student = Student.query.filter(*filters).first()
 
+        if not student:
+            return fail_api(msg="学生不存在")
+
+        update_data = {}
+        if sHeight:
+            update_data['sHeight'] = sHeight
+        if sWeight:
+            update_data['sWeight'] = sWeight
+        if sVitalCapacity:
+            update_data['sVitalCapacity'] = sVitalCapacity
+        if run50:
+            update_data['run50'] = run50
+        if standingLongJump:
+            update_data['standingLongJump'] = standingLongJump
+        if sittingForward:
+            update_data['sittingForward'] = sittingForward
+        if run800:
+            update_data['run800'] = run800
+        if run1000:
+            update_data['run1000'] = run1000
+        if oneMinuteSitUps:
+            update_data['oneMinuteSitUps'] = oneMinuteSitUps
+        if pullUP:
+            update_data['pullUP'] = pullUP
+
+
+
+        update_data2 = {}
+        if sHeight:
+            update_data2['sHeight'] = sHeight
+        if sWeight:
+            update_data2['sWeight'] = sWeight
+        if sVitalCapacity:
+            update_data2['sVitalCapacity'] = sVitalCapacity
+        if run50:
+            update_data2['run50'] = run50
+        if standingLongJump:
+            update_data2['standingLongJump'] = standingLongJump
+        if sittingForward:
+            update_data2['sittingForward'] = sittingForward
+        if run800:
+            update_data2['run800'] = run800
+        if run1000:
+            update_data2['run1000'] = run1000
+        if oneMinuteSitUps:
+            update_data2['oneMinuteSitUps'] = oneMinuteSitUps
+        if pullUP:
+            update_data2['pullUP'] = pullUP
+        try:
+
+            print(student.id)
+            if sCount=='1':
+                print('补测成绩添加和更新')
+                result=Unreach.query.filter_by(student_id=student.id).update(update_data2)
+            else:
+                print('首次成绩添加和更新')
+                result=Student.query.filter_by(sName=sName, sNumber=sNumber).update(update_data)
+                print(update_data)
+
+
+            # result = Student.query.filter_by(sName=sName, sNumber=sNumber).update(update_data)
+            # if result == 0:
+            #     print(f"调试信息: 更新失败，未找到匹配的学生记录，sName: {sName}, sNumber: {sNumber}")
+            # else:
+            #     print(f"调试信息: 更新成功，更新了 {result} 条记录")
+            db.session.commit()
+
+            if result == 0:
+                return fail_api(msg="更新失败，未找到匹配的学生记录")
+            else:
+                return success_api(msg="添加成功")
+
+        except Exception as e:
+            # 发生异常时回滚事务
+            db.session.rollback()
+            print(f"更新出错: {str(e)}")
+            return fail_api(msg="更新过程中发生错误")
 
 #  编辑用户
 @bp.get('/data/edit/<int:id>')
@@ -285,7 +290,9 @@ def show_small():
     db.session.commit()
     print(f"成功更新 {len(students)} 条学生记录")
 
-    return render_template('student/analysis.html')
+    colleges = College.query.all()
+
+    return render_template('student/analysis.html',colleges=colleges)
 
 
 
@@ -312,7 +319,6 @@ def info():
 # 学生信息
 @bp.get('/info/college')
 @authorize("student:info")
-@cache.cached(timeout=900)
 def infoCollege():
     colleges = College.query.all()
     return jsonify([{
@@ -327,7 +333,6 @@ def infoCollege():
 # 学生信息
 @bp.get('/info/data')
 @authorize("student:info")
-@cache.cached(timeout=900)
 def infoData():
     # 获取请求参数 姓名 学号
     real_name = str_escape(request.args.get('realname', type=str))
@@ -378,7 +383,6 @@ def infoData():
 #  编辑用户
 @bp.get('/info/edit/<int:id>')
 @authorize("student:info")
-@cache.cached(timeout=900)
 def infoEdit(id):
     student = curd.get_one_by_id(Student, id)
     colleges = College.query.all()
@@ -432,7 +436,6 @@ def dis_enable():
 # 成绩录入
 @bp.get('/info/add/')
 @authorize("student:add")
-@cache.cached(timeout=900)
 def infoAdd():
     colleges = College.query.all()
     return render_template('student/add.html', colleges=colleges)

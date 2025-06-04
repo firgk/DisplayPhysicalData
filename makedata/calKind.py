@@ -150,7 +150,7 @@ def student_cluster_analysis(students, output_file="student_clusters.json"):
 
 
 
-def student_cluster_analysis3(students, output_file="student_clusters2.json"):
+def student_cluster_analysis1(students, output_file="student_clusters2.json"):
     """
     使用层次聚类算法对学生进行聚类分析
     """

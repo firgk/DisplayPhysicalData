@@ -213,6 +213,7 @@
                                 </thead>
                                 <tbody>
                                     {% for item in prediction_info.time_series.项目预测 %}
+                                    {% if item.项目名称 != 'sHeight' and item.项目名称 != 'sWeight' %}
                                     <tr>
                                         <td>{% if item.项目名称 == 'sHeight' %}身高(cm)
                                             {% elif item.项目名称 == 'sWeight' %}体重(kg)
@@ -227,6 +228,7 @@
                                         <td>{{ item.预测下次成绩 }}</td>
                                         <td>{{ item.评估 }}</td>
                                     </tr>
+                                    {% endif %}
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -257,6 +259,7 @@
                                 </thead>
                                 <tbody>
                                     {% for item in prediction_info.regression.体能评估 %}
+                                    {% if item.项目 != 'sHeight' and item.项目 != 'sWeight' %}
                                     <tr>
                                         <td>{% if item.项目 == 'sHeight' %}身高(cm)
                                             {% elif item.项目 == 'sWeight' %}体重(kg)
@@ -275,6 +278,7 @@
                                         <td>{{ item.预测成绩 }}</td>
                                         <td>{{ item.评估 }}</td>
                                     </tr>
+                                    {% endif %}
                                     {% endfor %}
                                 </tbody>
                             </table>

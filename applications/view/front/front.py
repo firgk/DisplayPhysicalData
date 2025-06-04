@@ -68,16 +68,16 @@ def index():
                             # 根据簇特征生成类别描述
                             characteristics = cluster['簇特征']
                             cluster_description = "身体素质"
-                            if characteristics['平均身高'] > 180:
+                            if characteristics['平均身高'] > 172:
                                 cluster_description += "较高"
-                            elif characteristics['平均身高'] < 160:
+                            elif characteristics['平均身高'] < 170:
                                 cluster_description += "较低"
                             else:
                                 cluster_description += "中等"
                             
-                            if characteristics['平均体重'] > 70:
+                            if characteristics['平均体重'] > 65:
                                 cluster_description += "，体型偏重"
-                            elif characteristics['平均体重'] < 55:
+                            elif characteristics['平均体重'] < 62:
                                 cluster_description += "，体型偏轻"
                             else:
                                 cluster_description += "，体型适中"
@@ -149,12 +149,21 @@ def index():
 
 @bp.get('/cluster-analysis')
 @login_required
-@cache.cached(timeout=900)
 def cluster_analysis():
     try:
+
+        # 获取请求参数
+        college = request.args.get('college')  # 默认值为 '999' 表示全部学院
         # 读取聚类数据
-        json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
+        if college == '999':
+            json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
                                     'makedata', 'student_clusters.json')
+        # 不是999，则读取指定学院的聚类数据
+        # 文件名为 student_clusters_学院号.json
+        else :
+            json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
+                                          'makedata', f'student_clusters_{college}.json')
+
         with open(json_file_path, 'r', encoding='utf-8') as f:
             cluster_data = json.load(f)
         
@@ -239,12 +248,18 @@ def cluster_analysis():
 
 @bp.get('/cluster-analysis1')
 @login_required
-@cache.cached(timeout=900)
 def cluster_analysis1():
     try:
-        # 读取聚类数据
-        json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
+        college = request.args.get('college')  # 默认值为 '999' 表示全部学院
+        if college == '999':
+            json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
                                     'makedata', 'student_clusters1.json')
+        # 读取聚类数据
+        # 不是999，则读取指定学院的聚类数据
+        # 文件名为 student_clusters_学院号.json
+        else :
+            json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
+                                          'makedata', f'student_clusters1_{college}.json')
         with open(json_file_path, 'r', encoding='utf-8') as f:
             cluster_data = json.load(f)
         
@@ -329,12 +344,19 @@ def cluster_analysis1():
 
 @bp.get('/cluster-analysis2')
 @login_required
-@cache.cached(timeout=900)
 def cluster_analysis2():
     try:
-        # 读取聚类数据
-        json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
+        college = request.args.get('college')  # 默认值为 '999' 表示全部学院
+        if college == '999':
+            json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
                                     'makedata', 'student_clusters2.json')
+        # 读取聚类数据
+        # 不是999，则读取指定学院的聚类数据
+        # 文件名为 student_clusters_学院号.json
+        else :
+            json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
+                                          'makedata', f'student_clusters2_{college}.json')
+
         with open(json_file_path, 'r', encoding='utf-8') as f:
             cluster_data = json.load(f)
         
@@ -429,7 +451,6 @@ def cluster_analysis2():
 # 预测分析
 @bp.get('/unreach-analysis')
 @login_required
-@cache.cached(timeout=900)
 def unreach_analysis():
     try:
         print('开始读取预测分析数据...')

@@ -7,8 +7,8 @@ from calScore import calculate_score
 from calScore import calculate_score2
 from calError import calculate_error
 from calKind import student_cluster_analysis
+from calKind import student_cluster_analysis1
 from calKind import student_cluster_analysis2
-from calKind import student_cluster_analysis3
 from calPrediction import unreach_analysis
 
 
@@ -166,23 +166,23 @@ def generate_data(num,starter):
         update_at=fake.date_between(start_date=datetime(2025, 1, 1), end_date=datetime.now()).strftime('%Y-%m-%d')
         # 根据性别设置身高体重肺活量等数据的均值和标准差
         if s_sex == '男':
-            s_height = generate_normal_data(176.1, 10)
-            s_weight = generate_normal_data(65.1, 10)
-            s_vital_capacity = int(generate_normal_data(4800, 150))
-            run50 = generate_normal_data(6.3, 10)
-            standing_long_jump = generate_normal_data(270, 10)
-            sitting_forward = generate_normal_data(16.6, 10)
-            run1000 = generate_normal_data(240, 3)  # 平均值240秒，对应72分左右
-            pull_up = int(generate_normal_data(14.1, 10))
+            s_height = generate_normal_data(173.1, 3)
+            s_weight = generate_normal_data(65.1, 3)
+            s_vital_capacity = int(generate_normal_data(4200, 4))
+            run50 = generate_normal_data(6.9, 4)
+            standing_long_jump = generate_normal_data(230, 4)
+            sitting_forward = generate_normal_data(10.6,4)
+            run1000 = generate_normal_data(260, 4)  # 平均值240秒，对应72分左右
+            pull_up = int(generate_normal_data(8, 4))
         else:
-            s_height = generate_normal_data(165.9, 10)
-            s_weight = generate_normal_data(58.6, 10)
-            s_vital_capacity = int(generate_normal_data(3500, 10))
-            run50 = generate_normal_data(7.1, 10)
-            standing_long_jump = generate_normal_data(220, 10)
-            sitting_forward = generate_normal_data(14.7, 10)
-            run800 = generate_normal_data(230, 3)  # 平均值230秒，对应78分左右
-            one_minute_sit_ups = int(generate_normal_data(72.6, 10))
+            s_height = generate_normal_data(165.9, 3)
+            s_weight = generate_normal_data(58.6, 3)
+            s_vital_capacity = int(generate_normal_data(3300, 4))
+            run50 = generate_normal_data(7.9, 4)
+            standing_long_jump = generate_normal_data(160, 4)
+            sitting_forward = generate_normal_data(10.7,4)
+            run800 = generate_normal_data(240, 4)  # 平均值230秒，对应78分左右
+            one_minute_sit_ups = int(generate_normal_data(40, 4))
 
         student = Student(
             id=id,
@@ -211,12 +211,12 @@ def generate_data(num,starter):
 
 
 # 生成正态分布数据
+# std_dev 为 0.08 时，代表浮动范围为 百分之8
 def generate_normal_data(mean, std_dev):
     if std_dev == 0:
         return mean
     while True:
-        # value = round(random.gauss(mean, std_dev), 2)
-        value = round(random.gauss(mean, mean*0.2), 2) # 保留两位小数
+        value = round(random.gauss(mean, std_dev), 2) # 保留两位小数
         if value > 0:
             return value
 
@@ -225,10 +225,10 @@ def generate_normal_data(mean, std_dev):
 
 
 # 生成 30000 条数据
-
+# 300 个 87 为 3w
 students = []
-batch_size = 87
-num_batches = 300
+batch_size = 99
+num_batches = 301
 starter = 100
 for i in range(num_batches):
     datas = generate_data(batch_size,starter)
@@ -280,15 +280,16 @@ for student in students:
             oneMinuteSitUps='',
             pullUP=''
         )
-        
+        # 体重有10%的波动
+        # 其他会有20%的波动
         if student.sSex == '男':
-            s_weight = generate_normal_data(65.1, 10)
-            s_vital_capacity = int(generate_normal_data(4800, 150))
-            run50 = generate_normal_data(6.3, 10)
-            standing_long_jump = generate_normal_data(270, 10)
-            sitting_forward = generate_normal_data(16.6, 10)
-            run1000 = generate_normal_data(240, 3)  # 平均值240秒，对应72分左右
-            pull_up = int(generate_normal_data(14.1, 10))
+            s_weight = generate_normal_data(float(student.sWeight), 1)
+            s_vital_capacity = int(generate_normal_data(float(student.sVitalCapacity), 2))
+            run50 = generate_normal_data(float(student.run50), 2)
+            standing_long_jump = generate_normal_data(float(student.standingLongJump), 2)
+            sitting_forward = generate_normal_data(float(student.sittingForward), 2)
+            run1000 = generate_normal_data(float(student.run1000), 2)  # 平均值240秒，对应72分左右
+            pull_up = int(generate_normal_data(float(student.pullUP), 2))
             
             unreach_student.sWeight = str(s_weight)
             unreach_student.sVitalCapacity = str(s_vital_capacity)
@@ -298,13 +299,13 @@ for student in students:
             unreach_student.run1000 = str(run1000)
             unreach_student.pullUP = str(pull_up)
         else:
-            s_weight = generate_normal_data(58.6, 10)
-            s_vital_capacity = int(generate_normal_data(3500, 10))
-            run50 = generate_normal_data(7.1, 10)
-            standing_long_jump = generate_normal_data(220, 10)
-            sitting_forward = generate_normal_data(14.7, 10)
-            run800 = generate_normal_data(230, 3)  # 平均值230秒，对应78分左右
-            one_minute_sit_ups = int(generate_normal_data(72.6, 10))
+            s_weight = generate_normal_data(float(student.sWeight), 1)
+            s_vital_capacity = int(generate_normal_data(float(student.sVitalCapacity), 2))
+            run50 = generate_normal_data(float(student.run50), 2)
+            standing_long_jump = generate_normal_data(float(student.standingLongJump), 2)
+            sitting_forward = generate_normal_data(float(student.sittingForward), 2)
+            run800 = generate_normal_data(float(student.run800), 2)  # 平均值230秒，对应78分左右
+            one_minute_sit_ups = int(generate_normal_data(float(student.oneMinuteSitUps), 2))
             
             unreach_student.sWeight = str(s_weight)
             unreach_student.sVitalCapacity = str(s_vital_capacity)
@@ -377,9 +378,26 @@ print("预测分析完成")
 
 print("\n正在聚类分析...")
 student_cluster_analysis(students,'makedata/student_clusters.json')
-student_cluster_analysis2(students,'makedata/student_clusters1.json')
-student_cluster_analysis3(students,'makedata/student_clusters2.json')
+student_cluster_analysis1(students,'makedata/student_clusters1.json')
+student_cluster_analysis2(students,'makedata/student_clusters2.json')
 print("聚类分析完成")
+
+
+# 按照学院进行聚类分析
+college_clusters = {}
+for student in students:
+    college_code = student.collegeCode
+    if college_code not in college_clusters:
+        college_clusters[college_code] = []
+    college_clusters[college_code].append(student)
+
+# 遍历，执行函数
+for college_code, college_students in college_clusters.items():
+    print(f"正在分析学院: {college_code}...")
+    student_cluster_analysis(college_students, f'makedata/student_clusters_{college_code}.json')
+    student_cluster_analysis1(college_students, f'makedata/student_clusters1_{college_code}.json')
+    student_cluster_analysis2(college_students, f'makedata/student_clusters2_{college_code}.json')
+
 
 
 
